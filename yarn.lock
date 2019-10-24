@@ -4726,6 +4726,11 @@ immer@1.10.0:
   resolved "http://npm.caicloud.xyz/immer/-/immer-1.10.0.tgz#bad67605ba9c810275d91e1c2a47d4582e98286d"
   integrity sha512-O3sR1/opvCDGLEVcvrGTMtLac8GJ5IwZC4puPrLuRj3l7ICKvkmA0vGuU9OW8mV9WIBRnaxp5GJh9IEAaNOoYg==
 
+immutable@^4.0.0-rc.12:
+  version "4.0.0-rc.12"
+  resolved "http://npm.caicloud.xyz/immutable/-/immutable-4.0.0-rc.12.tgz#ca59a7e4c19ae8d9bf74a97bdf0f6e2f2a5d0217"
+  integrity sha512-0M2XxkZLx/mi3t8NVwIm1g8nHoEmM9p9UBl/G9k4+hm0kBgOVdMV/B3CY5dQ8qG8qc80NN4gDV4HQv6FTJ5q7A==
+
 import-cwd@^2.0.0:
   version "2.1.0"
   resolved "http://npm.caicloud.xyz/import-cwd/-/import-cwd-2.1.0.tgz#aa6cf36e722761285cb371ec6519f53e2435b0a9"
@@ -8431,6 +8436,23 @@ ret@~0.1.10:
   resolved "http://npm.caicloud.xyz/ret/-/ret-0.1.15.tgz#b8a4825d5bdb1fc3f6f53c2bc33f81388681c7bc"
   integrity sha1-uKSCXVvbH8P29Twrwz+BOIaBx7w=
 
+rete-connection-plugin@^0.9.0:
+  version "0.9.0"
+  resolved "http://npm.caicloud.xyz/rete-connection-plugin/-/rete-connection-plugin-0.9.0.tgz#3a6df36f55493a5c2ea021ae3147a0f0a6ada6ed"
+  integrity sha1-Om3zb1VJOlwuoCGuMUeg8Katpu0=
+
+rete-vue-render-plugin@^0.5.0:
+  version "0.5.0"
+  resolved "http://npm.caicloud.xyz/rete-vue-render-plugin/-/rete-vue-render-plugin-0.5.0.tgz#c7467f6f931c5af76cd8f4fc2a0b244eef68ac0d"
+  integrity sha1-x0Z/b5McWvds2PT8KgskTu9orA0=
+  dependencies:
+    vue "^2.6.6"
+
+rete@^1.4.2:
+  version "1.4.2"
+  resolved "http://npm.caicloud.xyz/rete/-/rete-1.4.2.tgz#069dcf27d6d0b9e539a08cb9919114a97f5548d5"
+  integrity sha1-Bp3PJ9bQueU5oIy5kZEUqX9VSNU=
+
 rework-visit@1.0.0:
   version "1.0.0"
   resolved "http://npm.caicloud.xyz/rework-visit/-/rework-visit-1.0.0.tgz#9945b2803f219e2f7aca00adb8bc9f640f842c9a"
@@ -9692,6 +9714,11 @@ vm-browserify@^1.0.1:
   version "1.1.0"
   resolved "http://npm.caicloud.xyz/vm-browserify/-/vm-browserify-1.1.0.tgz#bd76d6a23323e2ca8ffa12028dc04559c75f9019"
   integrity sha1-vXbWojMj4sqP+hICjcBFWcdfkBk=
+
+vue@^2.6.6:
+  version "2.6.10"
+  resolved "http://npm.caicloud.xyz/vue/-/vue-2.6.10.tgz#a72b1a42a4d82a721ea438d1b6bf55e66195c637"
+  integrity sha512-ImThpeNU9HbdZL3utgMCq0oiMzAkt1mcgy3/E6zWC/G6AaQoeuFdsl9nDhTDU3X1R6FK7nsIUuRACVcjI+A2GQ==
 
 w3c-hr-time@^1.0.1:
   version "1.0.1"
