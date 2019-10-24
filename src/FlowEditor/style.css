@@ -1,0 +1,11 @@
+.panel-button {
+  background: #f6f6f6;
+  border: none;
+  width: 68px;
+  height: 36px;
+  display: inline-block;
+  position: relative;
+  overflow: hidden;
+  left: 2px;
+  top: 2px;
+}
