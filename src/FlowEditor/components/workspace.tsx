@@ -1,8 +1,6 @@
 import React from "react";
 import { constants } from "../constants";
 
-console.log(constants, "asd");
-
 export default function WorkSpace() {
   const { MARKER_ARROW_WIDTH, MARKER_ARROW_HEIGHT } = constants;
   return (

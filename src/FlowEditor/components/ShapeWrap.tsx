@@ -21,12 +21,7 @@ const wrap = (shape: any, o: any) => {
     <g
       key={objID}
       id={objID}
-      className={
-        "svg-shape shape-container" +
-        (isCustomShape
-          ? " custom-shape custom-" + o.get("customClassName")
-          : "")
-      }
+      className={"svg-shape shape-container"}
       transform={o.get("transform")}
       {...customProps}
     >
@@ -82,7 +77,6 @@ export default function ShapeWrap(props: ShapeWraperProps) {
               />
             );
             break;
-
           case "path":
             shape = (
               <path

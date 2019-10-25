@@ -1,11 +1,18 @@
 import React from "react";
 import { fromJS } from "immutable";
 import { constants } from "./constants/index";
-import WorkSpace from "./components/workspace";
+import WorkSpace from "./components/WorkSpace";
 import Panel from "./components/Panel";
 import ShapeWrap from "./components/ShapeWrap";
-import { randomNumber, randomString } from "./utils";
+import {
+  randomNumber,
+  randomString,
+  pointTransform,
+  updateHandlersPos
+} from "./utils";
 import regularShapes from "./regularShapes";
+import ShapeHandler from "./components/ShapeHandler";
+import { number } from "prop-types";
 
 interface FlowEditorState {
   selectedElementID: string;
@@ -84,15 +91,145 @@ export default class FlowEditor extends React.Component<any, FlowEditorState> {
     objList: fromJS([])
   };
 
+  componentDidMount = () => {
+    (staticData.selector as any) = document.getElementById("selector-layer");
+  };
+
+  translate = (e: any) => {
+    const { CANVAS_LEFT_MARGIN, CANVAS_TOP_MARGIN } = constants;
+    let x = e.clientX - CANVAS_LEFT_MARGIN,
+      y = e.clientY - CANVAS_TOP_MARGIN;
+    let deltaX = x - staticData.transform.startX;
+    let deltaY = y - staticData.transform.startY;
+    staticData.transform.startX = x;
+    staticData.transform.startY = y;
+    staticData.transform.matrix[4] += deltaX;
+    staticData.transform.matrix[5] += deltaY;
+
+    (staticData.handlersPos as number[][]) = staticData.handlersPos.map(p => [
+      ((p as number[])[0] += deltaX),
+      ((p as number[])[1] += deltaY)
+    ]);
+
+    const placeholder = (staticData.selector as any).getElementsByTagName(
+      "polygon"
+    )[0]; // place-holder is a <polygon >
+    placeholder.setAttribute(
+      "points",
+      staticData.handlersPos.slice(0, 4).join(" ")
+    ); // 4 scale handlers, 1 rotate handler, for place-holder polygon, only the first 4 is needed
+  };
+
   keyUpHandler = () => {};
 
-  onMouseMove = () => {};
+  onMouseMove = (e: any) => {
+    if (!staticData.action || staticData.action === "text-editing") return;
 
-  onMouseDown = () => {
+    staticData.dragging = true;
+    switch (staticData.action) {
+      case "translate":
+        this.translate(e);
+        break;
+      // case "rotate":
+      //   this.rotate(e);
+      //   break;
+      // case "scale":
+      //   this.scale(e);
+      //   break;
+      // case "move-controlPoint":
+      //   this.moveControlPoint(e);
+      //   break;
+      // case "draw-line":
+      //   this.drawLine(e);
+      //   break;
+      default:
+        console.log("unknown action: ", staticData.action);
+    }
+  };
+
+  onMouseDown = (e: any) => {
+    const {
+      CANVAS_LEFT_MARGIN,
+      CANVAS_TOP_MARGIN,
+      ROTATE_HANDLER_MARGIN
+    } = constants;
+    staticData.transform.startX = e.clientX - CANVAS_LEFT_MARGIN;
+    staticData.transform.startY = e.clientY - CANVAS_TOP_MARGIN;
+    const target = e.target;
+    const selectedEle = target.closest(".shape-container");
+    if (
+      target.classList.contains("shape") &&
+      selectedEle &&
+      selectedEle.id === this.state.selectedElementID
+    ) {
+      staticData.action = "translate";
+      return;
+    }
+    if (selectedEle) {
+      staticData.selected.element = selectedEle;
+      const matrix = (staticData.transform.matrix = selectedEle
+        .getAttribute("transform")
+        .slice(7, -1)
+        .split(" ")
+        .map(parseFloat));
+      staticData.transform.rotateRad = Math.atan(matrix[2] / matrix[0]);
+      let x = (staticData.bbox.x = selectedEle.getAttribute("data-bboxx") * 1);
+      let y = (staticData.bbox.y = selectedEle.getAttribute("data-bboxy") * 1);
+      let w = (staticData.bbox.w = selectedEle.getAttribute("data-bboxw") * 1);
+      let h = (staticData.bbox.h = selectedEle.getAttribute("data-bboxh") * 1);
+      staticData.transform.scalingFactor = Math.sqrt(
+        matrix[0] * matrix[0] + matrix[1] * matrix[1]
+      );
+      let handlersPos = [
+        [x, y],
+        [x + w, y],
+        [x + w, y + h],
+        [x, y + h],
+        [
+          x + w / 2,
+          (y - ROTATE_HANDLER_MARGIN) / staticData.transform.scalingFactor
+        ]
+      ]; // the last one is the rotate handler
+      (staticData.handlersPos as any) = handlersPos.map(p =>
+        pointTransform(staticData.transform.matrix, p)
+      );
+      staticData.action = "translate";
+      this.setState({ selectedElementID: selectedEle.id });
+    } else {
+      (staticData.selected.element as any) = "";
+      staticData.transform.matrix = [];
+      staticData.action = "";
+      this.setState({ selectedElementID: "" });
+    }
     // analyze conditions of target element, switch element type, render element shape.
   };
 
-  onMouseUp = () => {};
+  onMouseUp = (e: any) => {
+    if (!staticData.action || !staticData.dragging) {
+      // dbl-click to enter text? this satisfies this "if", the result is: action/dragging both are false????
+      staticData.action = "";
+      staticData.dragging = false;
+      return;
+    } // empty action means you are clicking on empty space, false dragging means you are clicking then release, no movement
+    const matrix = staticData.transform.matrix;
+    const mStr = `matrix(${matrix.join(" ")})`;
+    const action = staticData.action;
+    switch (action) {
+      case "translate":
+        (staticData.selected.element as any).setAttribute("transform", mStr);
+        break;
+      default:
+        console.log("unknown action in mouseup");
+    }
+    if (
+      staticData.dragging &&
+      (action === "translate" || action === "rotate" || action === "scale")
+    ) {
+      updateHandlersPos(staticData);
+    }
+    staticData.dragging = false;
+    staticData.action = "";
+  };
 
   createShape = (e: any) => {
     const { objList } = this.state;
@@ -117,7 +254,7 @@ export default class FlowEditor extends React.Component<any, FlowEditorState> {
 
   render() {
     const { CANVAS_LEFT_MARGIN } = constants;
-    const { objList } = this.state;
+    const { objList, selectedElementID } = this.state;
     return (
       <div>
         <Panel createShape={this.createShape} />
@@ -145,9 +282,9 @@ export default class FlowEditor extends React.Component<any, FlowEditorState> {
           <rect width="100%" height="100%" fill="url(#grid)" />
           <ShapeWrap objList={objList} staticData={staticData} />
           <g id="selector-layer">
-            {/* {this.state.selectedElementID
-              ? showHandlers(this.staticData)
-              : null} */}
+            {selectedElementID ? (
+              <ShapeHandler staticData={staticData} />
+            ) : null}
           </g>
         </svg>
       </div>
