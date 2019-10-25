@@ -1,7 +1,7 @@
 import React from "react";
 import { fromJS } from "immutable";
 import { constants } from "./constants/index";
-import WorkSpace from "./components/WorkSpace";
+import BackGround from "./components/BackGround";
 import Panel from "./components/Panel";
 import ShapeWrap from "./components/ShapeWrap";
 import {
@@ -278,7 +278,7 @@ export default class FlowEditor extends React.Component<any, FlowEditorState> {
           onMouseDown={this.onMouseDown}
           onMouseUp={this.onMouseUp}
         >
-          <WorkSpace />
+          <BackGround />
           <rect width="100%" height="100%" fill="url(#grid)" />
           <ShapeWrap objList={objList} staticData={staticData} />
           <g id="selector-layer">
