@@ -1,7 +1,7 @@
 import React from "react";
 import { constants } from "../constants";
 
-export default function WorkSpace() {
+export default function BackGround() {
   const { MARKER_ARROW_WIDTH, MARKER_ARROW_HEIGHT } = constants;
   return (
     <defs>
