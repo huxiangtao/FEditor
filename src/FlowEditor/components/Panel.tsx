@@ -77,7 +77,6 @@ const regularShapes = [
 
 interface PanelProps {
   createShape(e: any): void; //NOTE: 创建shape
-  //(event: MouseEvent<HTMLButtonElement, MouseEvent>) => void'.
 }
 
 export default function Panel(props: PanelProps) {
