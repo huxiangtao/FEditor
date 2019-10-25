@@ -1,0 +1,34 @@
+{
+  "env": {
+    "es6": true,
+    "browser": true,
+    "node": true
+  },
+  "globals": {
+    "React": true,
+    "ReactDOM": true,
+    "_": true,
+    "IcoPath": true,
+    "i18n": true,
+    "moment": true,
+    "__webpack_public_path__": true,
+    "describe": true,
+    "it": true,
+    "expect": true
+  },
+  "parser": "babel-eslint",
+  "parserOptions": {
+    "sourceType": "module"
+  },
+  "extends": ["eslint:recommended", "plugin:react/recommended", "prettier"],
+  "plugins": ["prettier"],
+  "rules": {
+    "no-undef": "warn",
+    "no-console": "warn",
+    "no-unused-vars": "warn",
+    "react/no-find-dom-node": "warn",
+    "react/no-children-prop": "warn",
+    "react/prop-types": "warn",
+    "prettier/prettier": "error"
+  }
+}
