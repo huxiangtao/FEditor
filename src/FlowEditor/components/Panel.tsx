@@ -118,6 +118,7 @@ export default function Panel(props: PanelProps) {
           }
           return (
             <button
+              draggable={true}
               key={shape.id}
               className="panel-button"
               onClick={props.createShape}
