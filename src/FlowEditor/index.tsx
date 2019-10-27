@@ -10,6 +10,7 @@ import {
   pointTransform,
   updateHandlersPos,
   optimisePath,
+  generateAnimatePoints,
   updatePaths
 } from "./utils";
 import regularShapes from "./regularShapes";
@@ -256,9 +257,11 @@ export default class FlowEditor extends React.Component<any, FlowEditorState> {
         break;
       case "draw-line":
         // current draw line element
-        let line = staticData.drawLine.element;
+        const line = staticData.drawLine.element;
+
         if (!line) break;
         let path;
+        const lineId = (line as any).getAttribute("id");
 
         // this line's presence confirmed this is the moment when the line drawing is just finished
         bbox = (staticData.selected.element as any)
@@ -350,6 +353,7 @@ export default class FlowEditor extends React.Component<any, FlowEditorState> {
             };
           }
           return fromJS({
+            id: `${lineId}_animatepoints_${i}`,
             type: "animate_rect",
             x: curPos[0],
             y: curPos[1],
@@ -369,6 +373,8 @@ export default class FlowEditor extends React.Component<any, FlowEditorState> {
         console.log("unknown action in mouseup");
     }
     if (staticData.dragging && action === "translate") {
+      const line = staticData.drawLine.element;
+      const lineId = line ? (line as any).getAttribute("id") : "";
       updateHandlersPos(staticData);
       if (this.state.selectedElementID) {
         // update current element's all polyline paths.
@@ -376,7 +382,35 @@ export default class FlowEditor extends React.Component<any, FlowEditorState> {
           .lines;
         if (lines.size > 0) {
           // polylines could be updated locally when associated shape get transformed, but server also need to know the polyline changes(to be saved into mongoDB)
-          updatePaths(staticData.selected.element, lines);
+          const newPaths = updatePaths(staticData.selected.element, lines);
+
+          // update animate points pos
+          let { objList } = this.state;
+          const lineIDs: string[] = [];
+          const newPoints = newPaths.map((v: any) => {
+            const points = v.path.split(" "); // animation rect pos
+            lineIDs.push(v.lineID);
+            return generateAnimatePoints(points, v.lineID);
+          });
+          // remove all select element's path of animation points
+          objList = objList.filter((v: any) => {
+            if (v.get("id").indexOf("animatepoints") > -1) {
+              const selectLineId = v.get("id").split("_")[0];
+              if (lineIDs.indexOf(selectLineId) > -1) {
+                return false;
+              } else {
+                return true;
+              }
+            } else {
+              return true;
+            }
+          });
+          newPoints.forEach((v: any) => {
+            objList = objList.concat(v);
+          });
+          this.setState({
+            objList
+          });
         }
       }
     }

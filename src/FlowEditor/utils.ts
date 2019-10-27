@@ -1,4 +1,5 @@
 import { constants } from "./constants/index";
+import { fromJS } from "immutable";
 export function randomNumber( min: number, max: number ): number {
   min = Math.ceil( min );
   max = Math.floor( max );
@@ -250,8 +251,6 @@ export function updatePaths( selectedElement: any, connectedLine: any ) {
     let fromPoint = points[ 0 ].split( ',' ).map( ( num: any ) => parseInt( num ) );
     let toPoint = points[ points.length - 1 ].split( ',' ).map( ( num: any ) => parseInt( num ) );
 
-    console.log( points, fromPoint, toPoint, 'points====' )
-
     let shape1 = ele.getAttribute( 'data-shape1' ); // each line could have 2(or 1 or none) shape objects at its end point.
     let shape2 = ele.getAttribute( 'data-shape2' ); // if shape1/shape2 is undefined, that means this end has no shape object connected
 
@@ -282,6 +281,39 @@ export function updatePaths( selectedElement: any, connectedLine: any ) {
     results.push( { lineID: line, path: path } )
   }
   return results
+}
+
+export function updateAnimatePoints() { }
+
+export function generateAnimatePoints( points: any[], lineId: string ) {
+  const animatePoints = points.map( ( v: any, i: number ) => {
+    const nextPointsPos = i < points.length - 1 ? points[ i + 1 ] : "";
+    const curPos = v.split( "," );
+    const nextPos = nextPointsPos.split( "," );
+    let dis;
+    if ( curPos[ 0 ] === nextPos[ 0 ] ) {
+      dis = {
+        y: nextPos[ 1 ]
+      };
+    } else if ( curPos[ 1 ] === nextPos[ 1 ] ) {
+      dis = {
+        x: nextPos[ 0 ]
+      };
+    }
+    return fromJS( {
+      id: `${ lineId }_animatepoints_${ i }`,
+      type: "animate_rect",
+      x: curPos[ 0 ],
+      y: curPos[ 1 ],
+      stroke: "#424242",
+      strokeWidth: 1,
+      fill: "red",
+      index: i,
+      dis
+    } );
+  } );
+  animatePoints.pop();
+  return animatePoints;
 }
 
 // TODO: huxt 

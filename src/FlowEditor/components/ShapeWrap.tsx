@@ -138,6 +138,7 @@ export default function ShapeWrap(props: ShapeWraperProps) {
                   cx={o.get("x")}
                   cy={o.get("y")}
                   r="5"
+                  data-line-id={o.get("lineId")}
                   className="svg-shape shape"
                 >
                   {dir && (
