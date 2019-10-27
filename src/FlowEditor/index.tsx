@@ -9,7 +9,8 @@ import {
   randomString,
   pointTransform,
   updateHandlersPos,
-  optimisePath
+  optimisePath,
+  updatePaths
 } from "./utils";
 import regularShapes from "./regularShapes";
 import ShapeHandler from "./components/ShapeHandler";
@@ -252,8 +253,10 @@ export default class FlowEditor extends React.Component<any, FlowEditorState> {
         (staticData.selected.element as any).setAttribute("transform", mStr);
         break;
       case "draw-line":
-        const line = staticData.drawLine.element;
+        // current draw line element
+        let line = staticData.drawLine.element;
         if (!line) break;
+        let path;
 
         // this line's presence confirmed this is the moment when the line drawing is just finished
         bbox = (staticData.selected.element as any)
@@ -278,15 +281,58 @@ export default class FlowEditor extends React.Component<any, FlowEditorState> {
             bbox.top - CANVAS_TOP_MARGIN + Math.round(bbox.height / 2)
           ]
         ]; // todo: do the rounding inside optimisePath
-
         let hoveredEle = staticData.drawLine.hoveredElement; // todo: what if the hoveredEle is also the currently selected element
-        (hoveredEle as any).setAttribute("filter", "none");
-        let path;
-        let p = [e.clientX - CANVAS_LEFT_MARGIN, e.clientY - CANVAS_TOP_MARGIN];
-        path = optimisePath(fromRec, [p, p, p, p], SHAPE_LEADING_MARGIN);
-        (line as any)
-          .getElementsByClassName("shape")[0]
-          .setAttribute("points", path);
+        if (hoveredEle) {
+          let bbox2 = (hoveredEle as any).getBoundingClientRect();
+          let toRect = [
+            [
+              bbox2.left - CANVAS_LEFT_MARGIN + Math.round(bbox2.width / 2),
+              bbox2.top - CANVAS_TOP_MARGIN
+            ],
+            [
+              bbox2.right - CANVAS_LEFT_MARGIN,
+              bbox2.top - CANVAS_TOP_MARGIN + Math.round(bbox2.height / 2)
+            ],
+            [
+              bbox2.left - CANVAS_LEFT_MARGIN + Math.round(bbox2.width / 2),
+              bbox2.bottom
+            ],
+            [
+              bbox2.left - CANVAS_LEFT_MARGIN,
+              bbox2.top - CANVAS_TOP_MARGIN + Math.round(bbox2.height / 2)
+            ]
+          ];
+          (hoveredEle as any).setAttribute("filter", "none");
+          let hoveredEleID = (hoveredEle as any).closest(".shape-container").id;
+          path = optimisePath(fromRec, toRect, SHAPE_LEADING_MARGIN);
+
+          (line as any)
+            .getElementsByClassName("shape")[0]
+            .setAttribute("points", path);
+          (line as any)
+            .getElementsByClassName("shape")[0]
+            .setAttribute("data-shape2", hoveredEleID);
+
+          (staticData as any).attached[
+            (hoveredEle as any).closest(".shape-container").id
+          ].lines.add(staticData.drawLine.id);
+          (staticData as any).attached[
+            (hoveredEle as any).closest(".shape-container").id
+          ].lines.add(staticData.drawLine.id);
+        } else {
+          (staticData as any).attached[this.state.selectedElementID].lines.add(
+            staticData.drawLine.id
+          );
+          let p = [
+            e.clientX - CANVAS_LEFT_MARGIN,
+            e.clientY - CANVAS_TOP_MARGIN
+          ];
+          path = optimisePath(fromRec, [p, p, p, p], SHAPE_LEADING_MARGIN); // NOTE generate points for path
+          console.log(path, "path=====");
+          (line as any)
+            .getElementsByClassName("shape")[0]
+            .setAttribute("points", path);
+        }
         const points = path.split(" "); // animation rect pos
         const animatePoints = points.map((v, i) => {
           const nextPointsPos = i < points.length - 1 ? points[i + 1] : "";
@@ -321,11 +367,17 @@ export default class FlowEditor extends React.Component<any, FlowEditorState> {
       default:
         console.log("unknown action in mouseup");
     }
-    if (
-      staticData.dragging &&
-      (action === "translate" || action === "rotate" || action === "scale")
-    ) {
+    if (staticData.dragging && action === "translate") {
       updateHandlersPos(staticData);
+      // if (this.state.selectedElementID) {
+      //   // update current element's all polyline paths.
+      //   let lines = (staticData as any).attached[this.state.selectedElementID]
+      //     .lines;
+      //   if (lines.size > 0) {
+      //     // polylines could be updated locally when associated shape get transformed, but server also need to know the polyline changes(to be saved into mongoDB)
+      //     updatePaths(staticData.selected.element, lines);
+      //   }
+      // }
     }
     staticData.dragging = false;
     staticData.action = "";
@@ -380,6 +432,12 @@ export default class FlowEditor extends React.Component<any, FlowEditorState> {
   render() {
     const { CANVAS_LEFT_MARGIN } = constants;
     const { objList, selectedElementID } = this.state;
+    objList.forEach((o: any) => {
+      const objID = o.get("id");
+      if (!(staticData as any).attached[objID]) {
+        (staticData as any).attached[objID] = { lines: new Set(), text: "" };
+      }
+    });
     return (
       <div>
         <Panel createShape={this.createShape} />

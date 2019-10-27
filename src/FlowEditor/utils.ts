@@ -161,7 +161,8 @@ function walk( from: any, to: any, breadcrumb: any ) {
 export function optimisePath( rectA: any, rectB: any, leadingMargin: any ) { // both are arrays of 4 points(top, right, bottom, left). return value is a path string passed as d attribute value of <polyline> tag
   // 2 lines are too close to each other(like 10px), just draw a line and return.
 
-  let fromRect = init( rectA ), toRect = init( rectB ); // line goes from rectA to rectB with arrow pointing at rectB.
+  let fromRect = init( rectA ), toRect = init( rectB );
+  console.log( fromRect, toRect, 'elliot111111===' );// line goes from rectA to rectB with arrow pointing at rectB.
   let fromRectCentroid = [ fromRect[ 0 ].point[ 0 ], fromRect[ 1 ].point[ 1 ] ]; // centroidX is the X of first point(top point), centroidY is the Y of 2nd point(right point)
   let toRectCentroid = [ toRect[ 0 ].point[ 0 ], toRect[ 1 ].point[ 1 ] ];
   let fromCandidatePoints = [],
@@ -229,3 +230,67 @@ export function optimisePath( rectA: any, rectB: any, leadingMargin: any ) { // 
   breadcrumb = breadcrumb.map( b => b.map( num => Math.round( num * 100 ) / 100 ) ); // by default, the returned number has too many decimals which I don't need
   return breadcrumb.join( ' ' )
 };
+
+export function updatePaths( selectedElement: any, connectedLine: any ) {
+  const { CANVAS_LEFT_MARGIN, CANVAS_TOP_MARGIN, SHAPE_LEADING_MARGIN } = constants;
+  let results: any = [];
+  if ( !connectedLine || connectedLine.size === 0 ) return results;
+
+  let selectedElementID = selectedElement.closest( '.shape-container' ).id;
+  let selectedElementBbox = selectedElement.children[ 0 ].getBoundingClientRect(); // todo: don't use children[0], get element by className('shape') to get the concrete child element
+
+  for ( let line of connectedLine ) {
+    let path;
+    let ele = document.getElementById( line );
+    if ( !ele ) continue;
+
+    ( ele as any ) = ele.getElementsByClassName( 'shape' )[ 0 ];
+
+    let points = ( ele as any ).getAttribute( 'points' ).split( ' ' );
+
+    let fromPoint = points[ 0 ].split( ',' ).map( ( num: any ) => parseInt( num ) );
+    let toPoint = points[ points.length - 1 ].split( ',' ).map( ( num: any ) => parseInt( num ) );
+
+    console.log( points, fromPoint, toPoint, 'points====' )
+
+    let shape1 = ele.getAttribute( 'data-shape1' ); // each line could have 2(or 1 or none) shape objects at its end point.
+    let shape2 = ele.getAttribute( 'data-shape2' ); // if shape1/shape2 is undefined, that means this end has no shape object connected
+
+    let rects = {
+      fromRec: { shapeID: shape1, points: [ fromPoint, fromPoint, fromPoint, fromPoint ] }, // points array is supposed to be replaced if shapeID is not undefined.
+      toRec: { shapeID: shape2, points: [ toPoint, toPoint, toPoint, toPoint ] }
+    };
+    for ( let r in rects ) { // after this for..in loop, fromRec/toRec in rects array are updated
+      let bbox;
+      if ( ( rects as any )[ r ].shapeID && ( rects as any )[ r ].shapeID === selectedElementID ) {
+        bbox = selectedElementBbox;
+      } else if ( ( rects as any )[ r ].shapeID ) {
+        bbox = ( document as any ).getElementById( ( rects as any )[ r ].shapeID ).children[ 0 ].getBoundingClientRect(); // todo: need to check its existence
+      }
+
+      if ( bbox ) {
+        ( rects as any )[ r ].points = [
+          [ bbox.left - CANVAS_LEFT_MARGIN + Math.round( bbox.width / 2 ), bbox.top - CANVAS_TOP_MARGIN ],
+          [ bbox.right - CANVAS_LEFT_MARGIN, bbox.top - CANVAS_TOP_MARGIN + Math.round( bbox.height / 2 ) ],
+          [ bbox.left - CANVAS_LEFT_MARGIN + Math.round( bbox.width / 2 ), bbox.bottom ],
+          [ bbox.left - CANVAS_LEFT_MARGIN, bbox.top - CANVAS_TOP_MARGIN + Math.round( bbox.height / 2 ) ]
+        ]
+      }
+    }
+
+    path = optimisePath( rects.fromRec.points, rects.toRec.points, SHAPE_LEADING_MARGIN );
+    ele.setAttribute( 'points', path );
+    results.push( { lineID: line, path: path } )
+  }
+  return results
+}
+
+// TODO: huxt 
+// export function generatePathPoints( fromPoint: number[], targetPoint: number[] ) {
+//   const points: number[] = [];
+//   console.log( fromPoint, targetPoint, 'sss===' )
+//   const newPoint = [ fromPoint[ 0 ], targetPoint[ 1 ] ];
+
+//   return `${ fromPoint.join( ',' ) } ${ newPoint.join( ',' ) } ${ targetPoint.join( ',' ) }`
+// }
+
