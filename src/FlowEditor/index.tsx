@@ -221,6 +221,8 @@ export default class FlowEditor extends React.Component<any, FlowEditorState> {
             stroke: "#424242",
             strokeWidth: 1,
             fill: "none",
+            shape1: this.state.selectedElementID,
+            shape2: "",
             transform: "matrix(1 0 0 1 0 0)",
             points: `${candidatePoints[handlerID].join(",")} ${candidatePoints[
               handlerID
@@ -328,7 +330,6 @@ export default class FlowEditor extends React.Component<any, FlowEditorState> {
             e.clientY - CANVAS_TOP_MARGIN
           ];
           path = optimisePath(fromRec, [p, p, p, p], SHAPE_LEADING_MARGIN); // NOTE generate points for path
-          console.log(path, "path=====");
           (line as any)
             .getElementsByClassName("shape")[0]
             .setAttribute("points", path);
@@ -369,15 +370,15 @@ export default class FlowEditor extends React.Component<any, FlowEditorState> {
     }
     if (staticData.dragging && action === "translate") {
       updateHandlersPos(staticData);
-      // if (this.state.selectedElementID) {
-      //   // update current element's all polyline paths.
-      //   let lines = (staticData as any).attached[this.state.selectedElementID]
-      //     .lines;
-      //   if (lines.size > 0) {
-      //     // polylines could be updated locally when associated shape get transformed, but server also need to know the polyline changes(to be saved into mongoDB)
-      //     updatePaths(staticData.selected.element, lines);
-      //   }
-      // }
+      if (this.state.selectedElementID) {
+        // update current element's all polyline paths.
+        let lines = (staticData as any).attached[this.state.selectedElementID]
+          .lines;
+        if (lines.size > 0) {
+          // polylines could be updated locally when associated shape get transformed, but server also need to know the polyline changes(to be saved into mongoDB)
+          updatePaths(staticData.selected.element, lines);
+        }
+      }
     }
     staticData.dragging = false;
     staticData.action = "";

@@ -161,8 +161,7 @@ function walk( from: any, to: any, breadcrumb: any ) {
 export function optimisePath( rectA: any, rectB: any, leadingMargin: any ) { // both are arrays of 4 points(top, right, bottom, left). return value is a path string passed as d attribute value of <polyline> tag
   // 2 lines are too close to each other(like 10px), just draw a line and return.
 
-  let fromRect = init( rectA ), toRect = init( rectB );
-  console.log( fromRect, toRect, 'elliot111111===' );// line goes from rectA to rectB with arrow pointing at rectB.
+  let fromRect = init( rectA ), toRect = init( rectB );// line goes from rectA to rectB with arrow pointing at rectB.
   let fromRectCentroid = [ fromRect[ 0 ].point[ 0 ], fromRect[ 1 ].point[ 1 ] ]; // centroidX is the X of first point(top point), centroidY is the Y of 2nd point(right point)
   let toRectCentroid = [ toRect[ 0 ].point[ 0 ], toRect[ 1 ].point[ 1 ] ];
   let fromCandidatePoints = [],
