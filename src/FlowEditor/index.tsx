@@ -72,6 +72,11 @@ const staticData = {
     //     text: textID, this is the text shape ID, with which you could get text content/color/fontSize/fontFamily/width/etc
     //     lines: [lineA-ID, lineB-ID, ...], this is a Set, not an array,
     // }, objB-id: {text: {...}, lines: []
+  },
+  // NOTE: describe the struct of stageNodes
+  stageNode: {
+    nextStage: [],
+    preStage: []
   }
 };
 
