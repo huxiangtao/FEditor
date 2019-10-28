@@ -36,8 +36,6 @@ const staticData = {
     matrix: [1, 0, 0, 1, 0, 0],
     startX: 0,
     startY: 0,
-    diagonalRad: 0, // the radian or just call it width/height ratio, used in calculating deltaX/Y of mouse movement during scaling
-    scaleOrigin: [[], [], [], []],
     cx: 0,
     cy: 0 // center point of current shape after transform
   },
@@ -68,14 +66,17 @@ const staticData = {
     hoveredElement: null // when the line is still drawing, and you hover mouse on another shape(to draw a line between 2 shapes). This variable is that shape element
   },
 
-  animationPath: [],
-
   attached: {
     // key is the shapeID, value is an obj containing all the attached info (text, connected lines)
     // objA-id: {
     //     text: textID, this is the text shape ID, with which you could get text content/color/fontSize/fontFamily/width/etc
     //     lines: [lineA-ID, lineB-ID, ...], this is a Set, not an array,
     // }, objB-id: {text: {...}, lines: []
+  },
+  // NOTE: describe the struct of stageNodes
+  stageNode: {
+    nextStage: [],
+    preStage: []
   }
 };
 
@@ -139,7 +140,12 @@ export default class FlowEditor extends React.Component<any, FlowEditorState> {
       .setAttribute("points", staticData.drawLine.points.join(" "));
   };
 
-  keyUpHandler = () => {};
+  keyUpHandler = (e: any) => {
+    // svg-focusable is not available on safari, thus it won't capture the 'Delete' keyUp e. I have to use context menu to add 'del' item
+    let eleID = this.state.selectedElementID;
+    if (!eleID || (e.key !== "Backspace" && e.key !== "Delete")) return; // todo: need to test on windows/linux
+    this.removeShape(eleID);
+  };
 
   onMouseMove = (e: any) => {
     if (!staticData.action || staticData.action === "text-editing") return;
@@ -173,11 +179,11 @@ export default class FlowEditor extends React.Component<any, FlowEditorState> {
     }
     if (selectedEle) {
       staticData.selected.element = selectedEle;
-      const matrix = (staticData.transform.matrix = selectedEle
+      staticData.transform.matrix = selectedEle
         .getAttribute("transform")
         .slice(7, -1)
         .split(" ")
-        .map(parseFloat));
+        .map(parseFloat);
       let x = (staticData.bbox.x = selectedEle.getAttribute("data-bboxx") * 1);
       let y = (staticData.bbox.y = selectedEle.getAttribute("data-bboxy") * 1);
       let w = (staticData.bbox.w = selectedEle.getAttribute("data-bboxw") * 1);
@@ -188,6 +194,7 @@ export default class FlowEditor extends React.Component<any, FlowEditorState> {
       );
       staticData.action = "translate";
       this.setState({ selectedElementID: selectedEle.id });
+      return;
     }
 
     if (target.classList.contains("line-connect-handler")) {
@@ -231,6 +238,11 @@ export default class FlowEditor extends React.Component<any, FlowEditorState> {
           })
         )
       });
+    } else {
+      staticData.selected.element = null;
+      staticData.transform.matrix = [];
+      staticData.action = "";
+      this.setState({ selectedElementID: "" });
     }
     // analyze conditions of target element, switch element type, render element shape.
   };
@@ -338,33 +350,7 @@ export default class FlowEditor extends React.Component<any, FlowEditorState> {
             .setAttribute("points", path);
         }
         const points = path.split(" "); // animation rect pos
-        const animatePoints = points.map((v, i) => {
-          const nextPointsPos = i < points.length - 1 ? points[i + 1] : "";
-          const curPos = v.split(",");
-          const nextPos = nextPointsPos.split(",");
-          let dis;
-          if (curPos[0] === nextPos[0]) {
-            dis = {
-              y: nextPos[1]
-            };
-          } else if (curPos[1] === nextPos[1]) {
-            dis = {
-              x: nextPos[0]
-            };
-          }
-          return fromJS({
-            id: `${lineId}_animatepoints_${i}`,
-            type: "animate_rect",
-            x: curPos[0],
-            y: curPos[1],
-            stroke: "#424242",
-            strokeWidth: 1,
-            fill: "red",
-            index: i,
-            dis
-          });
-        });
-        animatePoints.pop();
+        const animatePoints = generateAnimatePoints(points, lineId);
         this.setState({
           objList: this.state.objList.concat(animatePoints)
         });
@@ -373,8 +359,6 @@ export default class FlowEditor extends React.Component<any, FlowEditorState> {
         console.log("unknown action in mouseup");
     }
     if (staticData.dragging && action === "translate") {
-      const line = staticData.drawLine.element;
-      const lineId = line ? (line as any).getAttribute("id") : "";
       updateHandlersPos(staticData);
       if (this.state.selectedElementID) {
         // update current element's all polyline paths.
@@ -464,6 +448,19 @@ export default class FlowEditor extends React.Component<any, FlowEditorState> {
     //console.log(e, "onHandlerHoverOut");
   };
 
+  removeShape = (shapeID: any) => {
+    const { objList } = this.state;
+    let shapeList;
+    let shapeIdx = objList.findIndex((s: any) => s.get("id") === shapeID);
+    if (shapeIdx > -1) {
+      shapeList = objList.delete(shapeIdx);
+      this.setState({
+        objList: shapeList,
+        selectedElementID: ""
+      });
+    }
+  };
+
   render() {
     const { CANVAS_LEFT_MARGIN } = constants;
     const { objList, selectedElementID } = this.state;
@@ -491,6 +488,7 @@ export default class FlowEditor extends React.Component<any, FlowEditorState> {
           version="1.1"
           baseProfile="full"
           focusable="true"
+          tabIndex={0}
           onKeyUp={this.keyUpHandler}
           onMouseMove={this.onMouseMove}
           onMouseDown={this.onMouseDown}

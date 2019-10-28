@@ -1,11 +1,11 @@
 export default {
   circle: {
-    type: 'circle', cx: 0, cy: 0, strokeWidth: 1, r: 40,
-    dataBboxX: -40, dataBboxY: -40, dataBboxW: 80, dataBboxH: 80, dataCX: 0, dataCY: 0,
+    type: 'circle', cx: 0, cy: 0, strokeWidth: 1, r: 10,
+    dataBboxX: -10, dataBboxY: -10, dataBboxW: 20, dataBboxH: 20, dataCX: 0, dataCY: 0,
   },
   rect: {
-    type: 'rect', fill: 'yellow', width: '160', height: '80', x: 0, y: 0, strokeWidth: 1,
-    dataBboxX: 0, dataBboxY: 0, dataBboxW: 160, dataBboxH: 80, dataCX: 80, dataCY: 40, // cx/cy can be calculated at runtime, but I'm too lazy to do that
+    type: 'rect', fill: 'yellow', width: '70', height: '35', x: 0, y: 0, strokeWidth: 1,
+    dataBboxX: 0, dataBboxY: 0, dataBboxW: 70, dataBboxH: 35, dataCX: 70, dataCY: 35, // cx/cy can be calculated at runtime, but I'm too lazy to do that
   },
   cubicBezier: {
     type: 'cubicBezier', fillOpacity: "0", strokeWidth: 3, d: "M200,400 C200,200 400,400 400,200",
@@ -16,8 +16,8 @@ export default {
     dataBboxX: 0, dataBboxY: 0, dataBboxW: 105, dataBboxH: 70, dataCX: 55, dataCY: 35,
   },
   diamond: {
-    type: 'path', strokeWidth: 1, d: "M116.5 61.68l-56.83 66.09L0 61.68 56.83 0l59.67 61.68z",
-    dataBboxX: 0, dataBboxY: 0, dataBboxW: 116, dataBboxH: 128, dataCX: 116 / 2, dataCY: 128 / 2,
+    type: 'path', strokeWidth: 1, d: "M 38 2 L 76 20 L 38 38 L 2 20 Z",
+    dataBboxX: 0, dataBboxY: 0, dataBboxW: 76, dataBboxH: 38, dataCX: 35.5, dataCY: 19,
   },
   callout: {
     type: 'path', stroke: '#000',
