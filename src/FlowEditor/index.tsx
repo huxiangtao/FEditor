@@ -139,7 +139,12 @@ export default class FlowEditor extends React.Component<any, FlowEditorState> {
       .setAttribute("points", staticData.drawLine.points.join(" "));
   };
 
-  keyUpHandler = () => {};
+  keyUpHandler = (e: any) => {
+    // svg-focusable is not available on safari, thus it won't capture the 'Delete' keyUp e. I have to use context menu to add 'del' item
+    let eleID = this.state.selectedElementID;
+    if (!eleID || (e.key !== "Backspace" && e.key !== "Delete")) return; // todo: need to test on windows/linux
+    this.removeShape(eleID);
+  };
 
   onMouseMove = (e: any) => {
     if (!staticData.action || staticData.action === "text-editing") return;
@@ -173,11 +178,11 @@ export default class FlowEditor extends React.Component<any, FlowEditorState> {
     }
     if (selectedEle) {
       staticData.selected.element = selectedEle;
-      const matrix = (staticData.transform.matrix = selectedEle
+      staticData.transform.matrix = selectedEle
         .getAttribute("transform")
         .slice(7, -1)
         .split(" ")
-        .map(parseFloat));
+        .map(parseFloat);
       let x = (staticData.bbox.x = selectedEle.getAttribute("data-bboxx") * 1);
       let y = (staticData.bbox.y = selectedEle.getAttribute("data-bboxy") * 1);
       let w = (staticData.bbox.w = selectedEle.getAttribute("data-bboxw") * 1);
@@ -188,6 +193,7 @@ export default class FlowEditor extends React.Component<any, FlowEditorState> {
       );
       staticData.action = "translate";
       this.setState({ selectedElementID: selectedEle.id });
+      return;
     }
 
     if (target.classList.contains("line-connect-handler")) {
@@ -231,6 +237,11 @@ export default class FlowEditor extends React.Component<any, FlowEditorState> {
           })
         )
       });
+    } else {
+      staticData.selected.element = null;
+      staticData.transform.matrix = [];
+      staticData.action = "";
+      this.setState({ selectedElementID: "" });
     }
     // analyze conditions of target element, switch element type, render element shape.
   };
@@ -464,6 +475,19 @@ export default class FlowEditor extends React.Component<any, FlowEditorState> {
     //console.log(e, "onHandlerHoverOut");
   };
 
+  removeShape = (shapeID: any) => {
+    const { objList } = this.state;
+    let shapeList;
+    let shapeIdx = objList.findIndex((s: any) => s.get("id") === shapeID);
+    if (shapeIdx > -1) {
+      shapeList = objList.delete(shapeIdx);
+      this.setState({
+        objList: shapeList,
+        selectedElementID: ""
+      });
+    }
+  };
+
   render() {
     const { CANVAS_LEFT_MARGIN } = constants;
     const { objList, selectedElementID } = this.state;
@@ -491,6 +515,7 @@ export default class FlowEditor extends React.Component<any, FlowEditorState> {
           version="1.1"
           baseProfile="full"
           focusable="true"
+          tabIndex={0}
           onKeyUp={this.keyUpHandler}
           onMouseMove={this.onMouseMove}
           onMouseDown={this.onMouseDown}
