@@ -106,10 +106,10 @@ export default class FlowEditor extends React.Component<any, FlowEditorState> {
 
   translate = (e: any) => {
     const { CANVAS_LEFT_MARGIN, CANVAS_TOP_MARGIN } = constants;
-    let x = e.clientX - CANVAS_LEFT_MARGIN,
+    const x = e.clientX - CANVAS_LEFT_MARGIN,
       y = e.clientY - CANVAS_TOP_MARGIN;
-    let deltaX = x - staticData.transform.startX;
-    let deltaY = y - staticData.transform.startY;
+    const deltaX = x - staticData.transform.startX;
+    const deltaY = y - staticData.transform.startY;
     staticData.transform.startX = x;
     staticData.transform.startY = y;
     staticData.transform.matrix[4] += deltaX;
@@ -133,7 +133,7 @@ export default class FlowEditor extends React.Component<any, FlowEditorState> {
     const { CANVAS_LEFT_MARGIN, CANVAS_TOP_MARGIN } = constants;
     if (!staticData.drawLine.element) return;
 
-    let x = e.clientX,
+    const x = e.clientX,
       y = e.clientY;
     (staticData.drawLine.points[1] as any) = [
       x - CANVAS_LEFT_MARGIN,
@@ -146,7 +146,7 @@ export default class FlowEditor extends React.Component<any, FlowEditorState> {
 
   keyUpHandler = (e: any) => {
     // svg-focusable is not available on safari, thus it won't capture the 'Delete' keyUp e. I have to use context menu to add 'del' item
-    let eleID = this.state.selectedElementID;
+    const eleID = this.state.selectedElementID;
     if (!eleID || (e.key !== "Backspace" && e.key !== "Delete")) return; // todo: need to test on windows/linux
     this.removeShape(eleID);
   };
@@ -188,11 +188,15 @@ export default class FlowEditor extends React.Component<any, FlowEditorState> {
         .slice(7, -1)
         .split(" ")
         .map(parseFloat);
-      let x = (staticData.bbox.x = selectedEle.getAttribute("data-bboxx") * 1);
-      let y = (staticData.bbox.y = selectedEle.getAttribute("data-bboxy") * 1);
-      let w = (staticData.bbox.w = selectedEle.getAttribute("data-bboxw") * 1);
-      let h = (staticData.bbox.h = selectedEle.getAttribute("data-bboxh") * 1);
-      let handlersPos = [[x, y], [x + w, y], [x + w, y + h], [x, y + h]]; // the last one is the rotate handler
+      const x = (staticData.bbox.x =
+        selectedEle.getAttribute("data-bboxx") * 1);
+      const y = (staticData.bbox.y =
+        selectedEle.getAttribute("data-bboxy") * 1);
+      const w = (staticData.bbox.w =
+        selectedEle.getAttribute("data-bboxw") * 1);
+      const h = (staticData.bbox.h =
+        selectedEle.getAttribute("data-bboxh") * 1);
+      const handlersPos = [[x, y], [x + w, y], [x + w, y + h], [x, y + h]];
       (staticData.handlersPos as any) = handlersPos.map(p =>
         pointTransform(staticData.transform.matrix, p)
       );
@@ -217,7 +221,7 @@ export default class FlowEditor extends React.Component<any, FlowEditorState> {
         [bbox.left - CANVAS_LEFT_MARGIN, bbox.top + bbox.height / 2] // left
       ];
 
-      let handlerID = parseInt(target.id.split("-")[3]);
+      const handlerID = parseInt(target.id.split("-")[3]);
       (staticData.drawLine.points as any) = [
         candidatePoints[handlerID], // start point pos
         candidatePoints[handlerID] // end point pos
@@ -251,7 +255,7 @@ export default class FlowEditor extends React.Component<any, FlowEditorState> {
     // analyze conditions of target element, switch element type, render element shape.
   };
 
-  onMouseUp = (e: any) => {
+  onMouseUp = () => {
     if (!staticData.action || !staticData.dragging) {
       // dbl-click to enter text? this satisfies this "if", the result is: action/dragging both are false????
       staticData.action = "";
@@ -303,45 +307,51 @@ export default class FlowEditor extends React.Component<any, FlowEditorState> {
         ]; // todo: do the rounding inside optimisePath
         const hoveredEle = staticData.drawLine.hoveredElement; // todo: what if the hoveredEle is also the currently selected element
         if (hoveredEle) {
-          const bbox2 = (hoveredEle as any).getBoundingClientRect();
-          const toRect = [
-            [
-              bbox2.left - CANVAS_LEFT_MARGIN + Math.round(bbox2.width / 2),
-              bbox2.top - CANVAS_TOP_MARGIN
-            ],
-            [
-              bbox2.right - CANVAS_LEFT_MARGIN,
-              bbox2.top - CANVAS_TOP_MARGIN + Math.round(bbox2.height / 2)
-            ],
-            [
-              bbox2.left - CANVAS_LEFT_MARGIN + Math.round(bbox2.width / 2),
-              bbox2.bottom
-            ],
-            [
-              bbox2.left - CANVAS_LEFT_MARGIN,
-              bbox2.top - CANVAS_TOP_MARGIN + Math.round(bbox2.height / 2)
-            ]
-          ];
-          (hoveredEle as any).setAttribute("filter", "none");
           const hoveredEleID = (hoveredEle as any).closest(".shape-container")
             .id;
-          const path = optimisePath(fromRec, toRect, SHAPE_LEADING_MARGIN);
+          if (hoveredEleID === this.state.selectedElementID) {
+            this.removeShape(staticData.drawLine.id);
+            staticData.drawLine.id = "";
+          } else {
+            const bbox2 = (hoveredEle as any).getBoundingClientRect();
+            const toRect = [
+              [
+                bbox2.left - CANVAS_LEFT_MARGIN + Math.round(bbox2.width / 2),
+                bbox2.top - CANVAS_TOP_MARGIN
+              ],
+              [
+                bbox2.right - CANVAS_LEFT_MARGIN,
+                bbox2.top - CANVAS_TOP_MARGIN + Math.round(bbox2.height / 2)
+              ],
+              [
+                bbox2.left - CANVAS_LEFT_MARGIN + Math.round(bbox2.width / 2),
+                bbox2.bottom
+              ],
+              [
+                bbox2.left - CANVAS_LEFT_MARGIN,
+                bbox2.top - CANVAS_TOP_MARGIN + Math.round(bbox2.height / 2)
+              ]
+            ];
+            (hoveredEle as any).setAttribute("filter", "none");
 
-          (line as any)
-            .getElementsByClassName("shape")[0]
-            .setAttribute("points", path); // NOTE: set polyline points pos
-          (line as any)
-            .getElementsByClassName("shape")[0]
-            .setAttribute("data-shape2", hoveredEleID); // NOTE: set target shape of the line
+            const path = optimisePath(fromRec, toRect, SHAPE_LEADING_MARGIN);
 
-          (staticData as any).attached[
-            (hoveredEle as any).closest(".shape-container").id
-          ].lines.add(staticData.drawLine.id); // NOTE: add line obj to target shape lines Set
-          const points = path.split(" "); // animation rect pos
-          const animatePoints = generateAnimatePoints(points, lineId);
-          this.setState({
-            objList: this.state.objList.concat(animatePoints)
-          });
+            (line as any)
+              .getElementsByClassName("shape")[0]
+              .setAttribute("points", path); // NOTE: set polyline points pos
+            (line as any)
+              .getElementsByClassName("shape")[0]
+              .setAttribute("data-shape2", hoveredEleID); // NOTE: set target shape of the line
+
+            (staticData as any).attached[
+              (hoveredEle as any).closest(".shape-container").id
+            ].lines.add(staticData.drawLine.id); // NOTE: add line obj to target shape lines Set
+            const points = path.split(" "); // animation rect pos
+            const animatePoints = generateAnimatePoints(points, lineId);
+            this.setState({
+              objList: this.state.objList.concat(animatePoints)
+            });
+          }
         } else {
           // NOTE: remove no target shape line
           this.removeShape(staticData.drawLine.id);
@@ -354,7 +364,7 @@ export default class FlowEditor extends React.Component<any, FlowEditorState> {
       updateHandlersPos(staticData);
       if (this.state.selectedElementID) {
         // update current element's all polyline paths.
-        let lines = (staticData as any).attached[this.state.selectedElementID]
+        const lines = (staticData as any).attached[this.state.selectedElementID]
           .lines;
         if (lines.size > 0) {
           // polylines could be updated locally when associated shape get transformed, but server also need to know the polyline changes(to be saved into mongoDB)
@@ -427,12 +437,15 @@ export default class FlowEditor extends React.Component<any, FlowEditorState> {
       return;
     }
 
-    if (staticData.drawLine.hoveredElement !== e.target) {
+    if (!_.isEqual(staticData.drawLine.hoveredElement, e.target)) {
       staticData.drawLine.hoveredElement = e.target;
-      (staticData.drawLine.hoveredElement as any).setAttribute(
-        "filter",
-        "url(#blurFilter2)"
-      );
+      const hoveredEleID = (e.target as any).closest(".shape-container").id;
+      if (hoveredEleID !== this.state.selectedElementID) {
+        (staticData.drawLine.hoveredElement as any).setAttribute(
+          "filter",
+          "url(#blurFilter2)"
+        );
+      }
     }
   };
 
@@ -443,7 +456,7 @@ export default class FlowEditor extends React.Component<any, FlowEditorState> {
   removeShape = (shapeID: any) => {
     const { objList } = this.state;
     let shapeList;
-    let shapeIdx = objList.findIndex((s: any) => s.get("id") === shapeID);
+    const shapeIdx = objList.findIndex((s: any) => s.get("id") === shapeID);
     if (shapeIdx > -1) {
       shapeList = objList.delete(shapeIdx);
       this.setState({
