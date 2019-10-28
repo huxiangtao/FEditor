@@ -1313,7 +1313,7 @@
   dependencies:
     "@types/react" "*"
 
-"@types/react@*", "@types/react@^16.9.9":
+"@types/react@*", "@types/react@^16.9.11":
   version "16.9.11"
   resolved "http://npm.caicloud.xyz/@types%2freact/-/react-16.9.11.tgz#70e0b7ad79058a7842f25ccf2999807076ada120"
   integrity sha1-cOC3rXkFinhC8lzPKZmAcHatoSA=
