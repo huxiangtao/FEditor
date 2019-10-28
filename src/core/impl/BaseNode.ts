@@ -5,7 +5,7 @@ class BaseNode implements FlowNode {
   inputs?: Input[]
   output?: Output
   sockets: Socket[]
-  validate: () => Promise<Validation>
+  validate: () => Promise<any>
   onTap: (node: FlowNode) => void
   run: () => Promise<void>
 

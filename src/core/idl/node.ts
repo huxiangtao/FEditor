@@ -1,14 +1,12 @@
-type FlowNodeStatus = 'default' | 'error'
-type Validation = string | false | null
-
 interface FlowNode {
   id: string
+  name: string
   inputs?: Input[]
   output?: Output
-  _link: (s: Socket) => void
-  _unlink: (s: Socket) => void
-  validate: () => Promise<Validation>
+  validate: () => Promise<any>
   run: () => Promise<void>
-  _validate: () => Promise<Validation> // internal
+  _link: (s: Socket) => void // internal
+  _unlink: (s: Socket) => void // internal
+  _validate: () => Promise<any> // internal
   _run: () => Promise<void> // internal
 }
