@@ -302,7 +302,7 @@ export function generateAnimatePoints( points: any[], lineId: string ) {
     }
     return fromJS( {
       id: `${ lineId }_animatepoints_${ i }`,
-      type: "animate_rect",
+      type: "animate_circle",
       x: curPos[ 0 ],
       y: curPos[ 1 ],
       stroke: "#424242",

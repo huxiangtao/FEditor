@@ -20,7 +20,6 @@ const wrap = (shape: any, o: any, handlers: any) => {
     "data-cx": o.get("dataCX"),
     "data-cy": o.get("dataCY")
   };
-  let isCustomShape = o.get("type") === "custom";
   return (
     <g
       key={objID}
@@ -127,7 +126,7 @@ export default function ShapeWrap(props: ShapeWraperProps) {
               />
             );
             break;
-          case "animate_rect":
+          case "animate_circle":
             const dir = o.get("dis");
             const attrName = dir && dir.get("x") ? "cx" : "cy";
             const moveAttr = attrName === "cx" ? "x" : "y";

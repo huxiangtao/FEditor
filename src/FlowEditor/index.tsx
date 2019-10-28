@@ -4,6 +4,7 @@ import { constants } from "./constants/index";
 import BackGround from "./components/BackGround";
 import Panel from "./components/Panel";
 import ShapeWrap from "./components/ShapeWrap";
+import _ from "lodash";
 import {
   randomNumber,
   randomString,
@@ -19,6 +20,12 @@ import ShapeHandler from "./components/ShapeHandler";
 interface FlowEditorState {
   selectedElementID: string;
   objList: any[];
+}
+
+interface stageNode {
+  nextStage: stageNode[];
+  preStage: stageNode[];
+  id: string;
 }
 
 const staticData = {
@@ -74,10 +81,7 @@ const staticData = {
     // }, objB-id: {text: {...}, lines: []
   },
   // NOTE: describe the struct of stageNodes
-  stageNode: {
-    nextStage: [],
-    preStage: []
-  }
+  stageNodeMap: {}
 };
 
 export default class FlowEditor extends React.Component<any, FlowEditorState> {
@@ -93,7 +97,7 @@ export default class FlowEditor extends React.Component<any, FlowEditorState> {
   componentDidUpdate = () => {
     if (staticData.drawLine.id) {
       // user has drawn a line
-      let ele = document.getElementById(staticData.drawLine.id);
+      const ele = document.getElementById(staticData.drawLine.id);
       if (ele) {
         (staticData.drawLine.element as any) = ele;
       }
@@ -272,7 +276,6 @@ export default class FlowEditor extends React.Component<any, FlowEditorState> {
         const line = staticData.drawLine.element;
 
         if (!line) break;
-        let path;
         const lineId = (line as any).getAttribute("id");
 
         // this line's presence confirmed this is the moment when the line drawing is just finished
@@ -298,10 +301,10 @@ export default class FlowEditor extends React.Component<any, FlowEditorState> {
             bbox.top - CANVAS_TOP_MARGIN + Math.round(bbox.height / 2)
           ]
         ]; // todo: do the rounding inside optimisePath
-        let hoveredEle = staticData.drawLine.hoveredElement; // todo: what if the hoveredEle is also the currently selected element
+        const hoveredEle = staticData.drawLine.hoveredElement; // todo: what if the hoveredEle is also the currently selected element
         if (hoveredEle) {
-          let bbox2 = (hoveredEle as any).getBoundingClientRect();
-          let toRect = [
+          const bbox2 = (hoveredEle as any).getBoundingClientRect();
+          const toRect = [
             [
               bbox2.left - CANVAS_LEFT_MARGIN + Math.round(bbox2.width / 2),
               bbox2.top - CANVAS_TOP_MARGIN
@@ -320,40 +323,29 @@ export default class FlowEditor extends React.Component<any, FlowEditorState> {
             ]
           ];
           (hoveredEle as any).setAttribute("filter", "none");
-          let hoveredEleID = (hoveredEle as any).closest(".shape-container").id;
-          path = optimisePath(fromRec, toRect, SHAPE_LEADING_MARGIN);
+          const hoveredEleID = (hoveredEle as any).closest(".shape-container")
+            .id;
+          const path = optimisePath(fromRec, toRect, SHAPE_LEADING_MARGIN);
 
           (line as any)
             .getElementsByClassName("shape")[0]
-            .setAttribute("points", path);
+            .setAttribute("points", path); // NOTE: set polyline points pos
           (line as any)
             .getElementsByClassName("shape")[0]
-            .setAttribute("data-shape2", hoveredEleID);
+            .setAttribute("data-shape2", hoveredEleID); // NOTE: set target shape of the line
 
           (staticData as any).attached[
             (hoveredEle as any).closest(".shape-container").id
-          ].lines.add(staticData.drawLine.id);
-          (staticData as any).attached[
-            (hoveredEle as any).closest(".shape-container").id
-          ].lines.add(staticData.drawLine.id);
+          ].lines.add(staticData.drawLine.id); // NOTE: add line obj to target shape lines Set
+          const points = path.split(" "); // animation rect pos
+          const animatePoints = generateAnimatePoints(points, lineId);
+          this.setState({
+            objList: this.state.objList.concat(animatePoints)
+          });
         } else {
-          (staticData as any).attached[this.state.selectedElementID].lines.add(
-            staticData.drawLine.id
-          );
-          let p = [
-            e.clientX - CANVAS_LEFT_MARGIN,
-            e.clientY - CANVAS_TOP_MARGIN
-          ];
-          path = optimisePath(fromRec, [p, p, p, p], SHAPE_LEADING_MARGIN); // NOTE generate points for path
-          (line as any)
-            .getElementsByClassName("shape")[0]
-            .setAttribute("points", path);
+          // NOTE: remove no target shape line
+          this.removeShape(staticData.drawLine.id);
         }
-        const points = path.split(" "); // animation rect pos
-        const animatePoints = generateAnimatePoints(points, lineId);
-        this.setState({
-          objList: this.state.objList.concat(animatePoints)
-        });
         break;
       default:
         console.log("unknown action in mouseup");
@@ -466,7 +458,11 @@ export default class FlowEditor extends React.Component<any, FlowEditorState> {
     const { objList, selectedElementID } = this.state;
     objList.forEach((o: any) => {
       const objID = o.get("id");
-      if (!(staticData as any).attached[objID]) {
+      // NOTE: only shape has this struct
+      if (
+        !(staticData as any).attached[objID] &&
+        !_.includes(["polyline", "animate_circle"], o.get("type"))
+      ) {
         (staticData as any).attached[objID] = { lines: new Set(), text: "" };
       }
     });
