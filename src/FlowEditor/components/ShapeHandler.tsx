@@ -7,7 +7,7 @@ interface ShapeHandlerProps {
 
 export default function ShapeHandler(props: ShapeHandlerProps) {
   const { staticData } = props;
-  const ele = staticData.selected.element;
+  const ele = staticData.selected;
   if (!ele) return null;
 
   const matrix = staticData.transform.matrix;

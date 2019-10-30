@@ -9,3 +9,11 @@
   left: 2px;
   top: 2px;
 }
+
+#work-space {
+  position: absolute;
+  left: 165px;
+  top: 0px;
+  height: 100%;
+  width: 100%;
+}

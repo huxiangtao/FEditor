@@ -1,10 +1,13 @@
 import { constants } from "./constants/index";
 import { fromJS } from "immutable";
+import _ from "lodash";
 export function randomNumber( min: number, max: number ): number {
   min = Math.ceil( min );
   max = Math.floor( max );
   return Math.floor( Math.random() * ( max - min ) ) + min; //The maximum is exclusive and the minimum is inclusive
 }
+
+const { SHAPE_LEADING_MARGIN } = constants;
 
 function dec2hex( dec: number ) {
   return ( "0" + dec.toString( 16 ) ).substr( -2 );
@@ -68,7 +71,7 @@ export function lineConnHandlers( bbox: any ) {
 
 export function updateHandlersPos( staticData: any ) {
   const lineConnector = lineConnHandlers(
-    staticData.selected.element.getBoundingClientRect()
+    staticData.selected.getBoundingClientRect()
   );
   Array.from( staticData.selector.getElementsByClassName( "handler" ) ).forEach(
     ( h: any, idx ) => {
@@ -159,7 +162,7 @@ function walk( from: any, to: any, breadcrumb: any ) {
   }
 }
 
-export function optimisePath( rectA: any, rectB: any, leadingMargin: any ) { // both are arrays of 4 points(top, right, bottom, left). return value is a path string passed as d attribute value of <polyline> tag
+export function optimisePath( rectA: any, rectB: any, leadingMargin: any = SHAPE_LEADING_MARGIN ) { // both are arrays of 4 points(top, right, bottom, left). return value is a path string passed as d attribute value of <polyline> tag
   // 2 lines are too close to each other(like 10px), just draw a line and return.
 
   let fromRect = init( rectA ), toRect = init( rectB );// line goes from rectA to rectB with arrow pointing at rectB.
@@ -233,7 +236,7 @@ export function optimisePath( rectA: any, rectB: any, leadingMargin: any ) { // 
 
 export function updatePaths( selectedElement: any, connectedLine: any ) {
   const { CANVAS_LEFT_MARGIN, CANVAS_TOP_MARGIN, SHAPE_LEADING_MARGIN } = constants;
-  let results: any = [];
+  let results: any = {};
   if ( !connectedLine || connectedLine.size === 0 ) return results;
 
   let selectedElementID = selectedElement.closest( '.shape-container' ).id;
@@ -277,43 +280,33 @@ export function updatePaths( selectedElement: any, connectedLine: any ) {
     }
 
     path = optimisePath( rects.fromRec.points, rects.toRec.points, SHAPE_LEADING_MARGIN );
-    ele.setAttribute( 'points', path );
-    results.push( { lineID: line, path: path } )
+    // NOTE: refresh the shapelist with react state instead of the setAttribute
+    //ele.setAttribute( 'points', path );
+    results[ line ] = path;
   }
   return results
 }
 
-export function updateAnimatePoints() { }
+export function generateCommonStyle( o: any ) {
+  return {
+    stroke: o.get( "stroke" ),
+    "stroke-width": o.get( "stroke-width" ),
+    "stroke-opacity": o.get( "stroke-opacity" ),
+    "stroke-dasharray": o.get( "stroke-dasharray" ),
+    fill: o.get( "fill" ),
+    "fill-opacity": o.get( "fill-opacity" )
+  };
+}
 
-export function generateAnimatePoints( points: any[], lineId: string ) {
-  const animatePoints = points.map( ( v: any, i: number ) => {
-    const nextPointsPos = i < points.length - 1 ? points[ i + 1 ] : "";
-    const curPos = v.split( "," );
-    const nextPos = nextPointsPos.split( "," );
-    let dis;
-    if ( curPos[ 0 ] === nextPos[ 0 ] ) {
-      dis = {
-        y: nextPos[ 1 ]
-      };
-    } else if ( curPos[ 1 ] === nextPos[ 1 ] ) {
-      dis = {
-        x: nextPos[ 0 ]
-      };
-    }
-    return fromJS( {
-      id: `${ lineId }_animatepoints_${ i }`,
-      type: "animate_circle",
-      x: curPos[ 0 ],
-      y: curPos[ 1 ],
-      stroke: "#424242",
-      strokeWidth: 1,
-      fill: "red",
-      index: i,
-      dis
-    } );
-  } );
-  animatePoints.pop();
-  return animatePoints;
+export function generateCustomProps( o: any ) {
+  return {
+    "data-bboxx": o.get( "dataBboxX" ),
+    "data-bboxy": o.get( "dataBboxY" ),
+    "data-bboxw": o.get( "dataBboxW" ),
+    "data-bboxh": o.get( "dataBboxH" ),
+    "data-cx": o.get( "dataCX" ),
+    "data-cy": o.get( "dataCY" )
+  };
 }
 
 // TODO: huxt 
