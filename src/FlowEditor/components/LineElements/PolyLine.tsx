@@ -64,7 +64,7 @@ export default class PolyLine extends BaseLine {
               cy={curPos[1]}
               r="5"
               data-line-id={`${id}_animatepoints_${i}`}
-              className={`svg-shape shape ${id}__animatepoints`}
+              className={`svg-shape shape animatepoints`}
             >
               <animate
                 attributeName={attrName}

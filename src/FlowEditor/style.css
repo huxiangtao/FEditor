@@ -11,7 +11,7 @@
 }
 
 #work-space {
-  position: absolute;
+  position: fixed;
   left: 165px;
   top: 0px;
   height: 100%;
