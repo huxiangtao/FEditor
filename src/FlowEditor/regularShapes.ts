@@ -16,7 +16,7 @@ export default {
     dataBboxX: 0, dataBboxY: 0, dataBboxW: 105, dataBboxH: 70, dataCX: 55, dataCY: 35,
   },
   diamond: {
-    type: 'path', strokeWidth: 1, d: "M 38 2 L 76 20 L 38 38 L 2 20 Z",
+    type: 'diamond', strokeWidth: 1, d: "M 38 2 L 76 20 L 38 38 L 2 20 Z",
     dataBboxX: 0, dataBboxY: 0, dataBboxW: 76, dataBboxH: 38, dataCX: 35.5, dataCY: 19,
   },
   callout: {
