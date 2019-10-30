@@ -6,7 +6,7 @@ interface BaseNodeProps {
   id: string;
   alias?: string;
   curElement: any;
-  //lines: Set<BaseLine>;
+  staticData?: any;
   onHover?: (e: any) => void;
   onHoverOut?: (e: any) => void;
   onClick?: (e: any) => void;

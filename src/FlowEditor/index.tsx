@@ -74,7 +74,7 @@ export default class FlowEditor extends React.Component<any, FlowEditorState> {
     const placeholder = (this.staticData.selector as any).getElementsByTagName(
       "polygon"
     )[0]; // place-holder is a <polygon >
-    placeholder.setAttribute("points", nextHandlerPos.join(" "));
+    placeholder && placeholder.setAttribute("points", nextHandlerPos.join(" "));
   };
 
   drawLine = (e: any) => {
@@ -285,7 +285,7 @@ export default class FlowEditor extends React.Component<any, FlowEditorState> {
   removeShape = (shapeID: any) => {
     const { objList } = this.state;
     const shapeIdx = objList.findIndex((s: any) => s.get("id") === shapeID);
-    //const lines = (this.staticData as any).attached[shapeID].lines;
+    //const lines = (this.staticData as any).attached[shapeID].lines; remove relation lines
     if (shapeIdx > -1) {
       this.setState({
         objList: objList.delete(shapeIdx),
@@ -299,7 +299,9 @@ export default class FlowEditor extends React.Component<any, FlowEditorState> {
     console.log("elliot130");
   };
 
-  onPauseClick = () => {};
+  onPauseClick = (pauseId: string) => {
+    console.log(pauseId, "elliot198===");
+  };
 
   render() {
     const { objList, selectedElementID } = this.state;

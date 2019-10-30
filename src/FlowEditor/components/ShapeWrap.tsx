@@ -9,11 +9,11 @@ interface ShapeWraperProps {
   objList: any[];
   staticData: any;
   handlers: any;
-  selectedElementID: string;
+  selectedElementID?: string;
 }
 
 export default function ShapeWrap(props: ShapeWraperProps) {
-  const { objList, staticData, handlers, selectedElementID } = props;
+  const { objList, staticData, handlers } = props;
   return (
     <g className="all-shape-wrapper">
       {objList.map(o => {
@@ -24,6 +24,7 @@ export default function ShapeWrap(props: ShapeWraperProps) {
               <CircleNode
                 id={o.get("id")}
                 curElement={o}
+                staticData={staticData}
                 onClick={handlers.onPauseClick}
                 onContextMenu={handlers.onContextMenu}
                 onHover={handlers.onHover}
