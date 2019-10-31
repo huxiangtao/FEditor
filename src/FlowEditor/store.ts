@@ -2,8 +2,10 @@ import {
   randomString,
   pointTransform,
 } from "./utils";
+import { fromJS, Map } from "immutable";
 import _ from "lodash";
 import { constants } from "./constants/index";
+import { TreeNode } from "./type";
 interface AttachedItem {
   lines: Set<any>
   text: string
@@ -15,11 +17,16 @@ interface Attached {
 export default class Store {
   constructor () {
     this.attached = {};
+    this.NodeMap = fromJS( {} )
   }
 
   selected: any
 
   attached: Attached
+
+  Node = {};
+
+  NodeMap: Map<string, TreeNode>
 
   selector: any
 
@@ -49,10 +56,29 @@ export default class Store {
     [],
   ]
   bbox = { x: 0, y: 0, w: 0, h: 0 }
-  pauseStatus = true
+
+  createNode( id: string ) {
+    this.NodeMap = this.NodeMap.set( id, { id, nextNodes: fromJS( {} ), preNodes: fromJS( {} ) } )
+  }
+
+  // TODO:huxt get root node of the flow
+  getRootNode() {
+    return this.NodeMap.size > 0 ? this.NodeMap.first() : null;
+  }
+
+  linkNode( fromId: string, to: TreeNode ) {
+    const toId = to.id;
+    const nextNodes = ( this.NodeMap.get( fromId ) as TreeNode ).nextNodes;
+    const preNodes = ( this.NodeMap.get( toId ) as TreeNode ).preNodes;
+    ( this.NodeMap.get( fromId ) as TreeNode ).nextNodes = ( nextNodes as Map<string, TreeNode> ).set( toId, to );
+    ( this.NodeMap.get( toId ) as TreeNode ).preNodes = ( preNodes as Map<string, TreeNode> ).set( fromId, this.NodeMap.get( fromId ) as TreeNode );
+  }
+
+  getNode( id: string ) {
+    return this.NodeMap.get( id );
+  }
 
   updateSelected( select: any ) {
-
     if ( select ) {
       // NOTE: if set new selected element
       // should update the drawline id of this selected element
