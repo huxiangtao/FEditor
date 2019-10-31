@@ -3,6 +3,7 @@ import { fromJS, List } from "immutable";
 import { constants } from "./constants/index";
 import BackGround from "./components/BackGround";
 import Panel from "./components/Panel";
+import "antd/dist/antd.css";
 import ShapeWrap from "./components/ShapeWrap";
 import _ from "lodash";
 import {
@@ -17,6 +18,9 @@ import regularShapes from "./regularShapes";
 import ShapeHandler from "./components/ShapeHandler";
 import "./style.css";
 import Store from "./store";
+import ActionMenu from "./components/actionMenu";
+import TestChild from "./components/TestChild";
+import { TreeNode } from "./type";
 
 interface FlowEditorState {
   selectedElementID: string;
@@ -210,6 +214,11 @@ export default class FlowEditor extends React.Component<any, FlowEditorState> {
               (hoveredEle as any).closest(".shape-container").id,
               this.staticData.drawLine.id
             ); // NOTE: add line obj to target shape lines Set
+            this.staticData.linkNode(
+              selectedElementID,
+              this.staticData.NodeMap.get(hoveredEleID) as TreeNode
+            );
+            //console.log(this.staticData.NodeMap, "staticData");
           }
         } else {
           // NOTE: remove no target shape line
@@ -255,6 +264,8 @@ export default class FlowEditor extends React.Component<any, FlowEditorState> {
       transform: `matrix(${matrix.join(" ")})`
     };
     Object.assign(newShape, customProps);
+    // set new node int NodeMap
+    this.staticData.createNode(id);
     this.setState({
       objList: objList.push(fromJS(newShape))
     });
@@ -354,6 +365,8 @@ export default class FlowEditor extends React.Component<any, FlowEditorState> {
             ) : null}
           </g>
         </svg>
+        <ActionMenu nodeMap={this.staticData.NodeMap} />
+        {/* <TestChild /> */}
       </div>
     );
   }

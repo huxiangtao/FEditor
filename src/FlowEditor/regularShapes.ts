@@ -15,6 +15,10 @@ export default {
     type: 'polygon', points: '55,0 105,70 0,70', strokeWidth: 1,
     dataBboxX: 0, dataBboxY: 0, dataBboxW: 105, dataBboxH: 70, dataCX: 55, dataCY: 35,
   },
+  human: {
+    type: 'human', points: '55,0 105,70 0,70', strokeWidth: 1,
+    dataBboxX: 0, dataBboxY: 0, dataBboxW: 105, dataBboxH: 70, dataCX: 55, dataCY: 35,
+  },
   diamond: {
     type: 'diamond', strokeWidth: 1, d: "M 38 2 L 76 20 L 38 38 L 2 20 Z",
     dataBboxX: 0, dataBboxY: 0, dataBboxW: 76, dataBboxH: 38, dataCX: 35.5, dataCY: 19,

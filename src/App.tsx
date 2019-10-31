@@ -1,5 +1,4 @@
 import React from "react";
-import logo from "./logo.svg";
 import FlowEditor from "./FlowEditor";
 import "./App.css";
 
