@@ -1,11 +1,8 @@
 import React from "react";
-import { constants } from "../constants/index";
 import { Button } from "antd";
+import { constants } from "../constants/index";
 import "../style.css";
 
-const rect = (props: any) => <rect {...props} />;
-const path = (props: any) => <path {...props} />;
-const ellipse = (props: any) => <ellipse {...props} />;
 const commonProps = {
   className: "shape-button",
   fill: "#fff",
@@ -18,39 +15,28 @@ interface PanelProps {
   createApp?(): void;
 }
 
+const shapeComponentMap = {
+  common: <rect x={1} y={1} width={66} height={34} {...commonProps} />,
+  human: (
+    <path d="M 6 2 L 30 18 L 6 34 Z" strokeMiterlimit={10} {...commonProps} />
+  ),
+  pause: <ellipse cx={28} cy={18} rx={15.6} ry={15.6} {...commonProps} />,
+  logic: (
+    <path
+      d="M 18 2 L 34 18 L 18 34 L 2 18 Z"
+      strokeMiterlimit={10}
+      {...commonProps}
+    />
+  )
+};
+
 export default class Panel extends React.Component<PanelProps, any> {
   state = {
-    regularShapes: [
-      {
-        tag: "rect",
-        id: "create-rect",
-        attributes: { x: 1, y: 1, width: 66, height: 34, ...commonProps }
-      },
-      {
-        tag: "path",
-        id: "create-triangle",
-        attributes: {
-          d: "M 6 2 L 30 18 L 6 34 Z",
-          strokeMiterlimit: 10,
-          ...commonProps
-        }
-      },
-      {
-        tag: "ellipse",
-        id: "create-circle",
-        attributes: {
-          cx: "18",
-          cy: "18",
-          rx: "15.6",
-          ry: "15.6",
-          ...commonProps
-        }
-      },
-      {
-        tag: "path",
-        id: "create-diamond",
-        attributes: { d: "M 18 2 L 34 18 L 18 34 L 2 18 Z", ...commonProps }
-      }
+    appList: [
+      { id: "app1", type: "common" },
+      { id: "app2", type: "human" },
+      { id: "app2", type: "pause" },
+      { id: "app3", type: "logic" }
     ]
   };
   addApp = () => {
@@ -61,7 +47,7 @@ export default class Panel extends React.Component<PanelProps, any> {
 
   render() {
     const { CANVAS_LEFT_MARGIN } = constants;
-    const { regularShapes } = this.state;
+    const { appList } = this.state;
     const buttonContainerStyle = {
       display: "flex",
       justifyContent: "space-evenly",
@@ -87,28 +73,18 @@ export default class Panel extends React.Component<PanelProps, any> {
           Add App
         </Button>
         <div style={buttonContainerStyle}>
-          {regularShapes.map(shape => {
-            let tag;
-            switch (shape.tag) {
-              case "rect":
-                tag = rect(shape.attributes);
-                break;
-              case "path":
-                tag = path(shape.attributes);
-                break;
-              case "ellipse":
-                tag = ellipse(shape.attributes);
-                break;
-            }
+          {appList.map(app => {
             return (
               <button
                 draggable={true}
-                key={shape.id}
+                key={app.id}
                 className="panel-button"
                 onClick={this.props.createShape}
-                id={shape.id}
+                id={app.id}
               >
-                <svg pointerEvents="none">{tag}</svg>
+                <svg pointerEvents="none">
+                  {(shapeComponentMap as any)[app.type]}
+                </svg>
               </button>
             );
           })}
