@@ -11,19 +11,19 @@ const commonProps = {
 };
 
 interface PanelProps {
-  createShape(e: any): void; //NOTE: 创建shape
+  createShape(type: string, id: string, position: number[]): void; //NOTE: 创建shape
   createApp?(): void;
 }
 
 const shapeComponentMap = {
-  common: <rect x={1} y={1} width={66} height={34} {...commonProps} />,
+  common: <rect x="7" y="3" width="66" height="34" {...commonProps} />,
   human: (
     <path d="M 6 2 L 30 18 L 6 34 Z" strokeMiterlimit={10} {...commonProps} />
   ),
-  pause: <ellipse cx={28} cy={18} rx={15.6} ry={15.6} {...commonProps} />,
+  pause: <ellipse cx={38} cy={20} rx={15.6} ry={15.6} {...commonProps} />,
   logic: (
     <path
-      d="M 18 2 L 34 18 L 18 34 L 2 18 Z"
+      d="M 38 2 L 76 20 L 38 38 L 2 20 Z"
       strokeMiterlimit={10}
       {...commonProps}
     />
@@ -34,15 +34,38 @@ export default class Panel extends React.Component<PanelProps, any> {
   state = {
     appList: [
       { id: "app1", type: "common" },
+      { id: "app3", type: "logic" },
       { id: "app2", type: "human" },
-      { id: "app2", type: "pause" },
-      { id: "app3", type: "logic" }
+      { id: "app2", type: "pause" }
     ]
   };
+  curCloneNode = null;
   addApp = () => {
     // TODO:huxt 暴露给外部的创建服务接口
     //(this.props.createApp as any)();
     this.setState({});
+  };
+
+  dragStart = (e: any) => {
+    const crt = e.target.cloneNode(true);
+    crt.style.backgroundColor = "none";
+    crt.style.position = "absolute";
+    crt.style.top = "0px";
+    crt.style.left = "-100px";
+    document.body.appendChild(crt);
+    e.dataTransfer.setDragImage(crt, 0, 0);
+    this.curCloneNode = crt;
+  };
+
+  dragEnd = (e: any, id: string, type: string) => {
+    const { CANVAS_LEFT_MARGIN } = constants;
+    const { createShape } = this.props;
+    if (e.clientX > CANVAS_LEFT_MARGIN) {
+      createShape(type, id, [e.clientX - CANVAS_LEFT_MARGIN, e.clientY]);
+    }
+    if (this.curCloneNode) {
+      document.body.removeChild(this.curCloneNode as any);
+    }
   };
 
   render() {
@@ -75,17 +98,19 @@ export default class Panel extends React.Component<PanelProps, any> {
         <div style={buttonContainerStyle}>
           {appList.map(app => {
             return (
-              <button
+              <div
+                onDragStart={this.dragStart}
+                onDragEnd={(e: any) => {
+                  this.dragEnd(e, app.id, app.type);
+                }}
                 draggable={true}
                 key={app.id}
                 className="panel-button"
-                onClick={this.props.createShape}
-                id={app.id}
               >
                 <svg pointerEvents="none">
                   {(shapeComponentMap as any)[app.type]}
                 </svg>
-              </button>
+              </div>
             );
           })}
         </div>

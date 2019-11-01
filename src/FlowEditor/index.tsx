@@ -248,24 +248,23 @@ export default class FlowEditor extends React.Component<any, FlowEditorState> {
     this.staticData.resetActionType();
   };
 
-  createShape = (e: any) => {
+  createShape = (type: string, id: string, position: number[]) => {
     const { objList } = this.state;
     const { FILL, STROKE } = constants;
-    const matrix = [1, 0, 0, 1, randomNumber(0, 800), randomNumber(0, 480)];
-    const type: string = e.target.id.split("-")[1];
-    const id = randomString(12);
+    const matrix = [1, 0, 0, 1, position[0], position[1]];
     const newShape = (regularShapes as any)[type];
     const fill = FILL[Math.floor(Math.random() * FILL.length)];
     const stroke = STROKE[Math.floor(Math.random() * STROKE.length)];
+    const shapeId = `${id}_${randomString(12)}`;
     const customProps = {
-      id,
+      id: shapeId,
       fill,
       stroke,
       transform: `matrix(${matrix.join(" ")})`
     };
     Object.assign(newShape, customProps);
     // set new node int NodeMap
-    this.staticData.createNode(id);
+    this.staticData.createNode(shapeId);
     this.setState({
       objList: objList.push(fromJS(newShape))
     });
@@ -314,6 +313,10 @@ export default class FlowEditor extends React.Component<any, FlowEditorState> {
     console.log(pauseId, "elliot198===");
   };
 
+  onDrop = (e: any) => {
+    e.preventDefault();
+  };
+
   render() {
     const { objList, selectedElementID } = this.state;
     objList.forEach((o: any) => {
@@ -336,35 +339,36 @@ export default class FlowEditor extends React.Component<any, FlowEditorState> {
     return (
       <div>
         <Panel createShape={this.createShape} />
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          xmlnsXlink="http://www.w3.org/1999/xlink"
-          id="work-space"
-          version="1.1"
-          baseProfile="full"
-          tabIndex={0}
-          onKeyUp={this.keyUpHandler}
-          onMouseMove={this.onMouseMove}
-          onMouseDown={this.onMouseDown}
-          onMouseUp={this.onMouseUp}
-        >
-          <BackGround />
-          <ShapeWrap
-            selectedElementID={selectedElementID}
-            objList={objList}
-            staticData={this.staticData}
-            handlers={{
-              onHover: this.onHover,
-              onPauseClick: this.onPauseClick,
-              onContextMenu: this.onContextMenu
-            }}
-          />
-          <g id="selector-layer">
-            {selectedElementID ? (
-              <ShapeHandler staticData={this.staticData} />
-            ) : null}
-          </g>
-        </svg>
+        <div id="work-space" onDragOver={this.onDrop}>
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            xmlnsXlink="http://www.w3.org/1999/xlink"
+            version="1.1"
+            baseProfile="full"
+            id="work-space-svg"
+            onKeyUp={this.keyUpHandler}
+            onMouseMove={this.onMouseMove}
+            onMouseDown={this.onMouseDown}
+            onMouseUp={this.onMouseUp}
+          >
+            <BackGround />
+            <ShapeWrap
+              selectedElementID={selectedElementID}
+              objList={objList}
+              staticData={this.staticData}
+              handlers={{
+                onHover: this.onHover,
+                onPauseClick: this.onPauseClick,
+                onContextMenu: this.onContextMenu
+              }}
+            />
+            <g id="selector-layer">
+              {selectedElementID ? (
+                <ShapeHandler staticData={this.staticData} />
+              ) : null}
+            </g>
+          </svg>
+        </div>
         <ActionMenu nodeMap={this.staticData.NodeMap} />
         {/* <TestChild /> */}
       </div>

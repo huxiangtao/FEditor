@@ -15,10 +15,6 @@ export default {
     type: 'polygon', points: '55,0 105,70 0,70', strokeWidth: 1,
     dataBboxX: 0, dataBboxY: 0, dataBboxW: 105, dataBboxH: 70, dataCX: 55, dataCY: 35,
   },
-  human: {
-    type: 'human', points: '55,0 105,70 0,70', strokeWidth: 1,
-    dataBboxX: 0, dataBboxY: 0, dataBboxW: 105, dataBboxH: 70, dataCX: 55, dataCY: 35,
-  },
   diamond: {
     type: 'diamond', strokeWidth: 1, d: "M 38 2 L 76 20 L 38 38 L 2 20 Z",
     dataBboxX: 0, dataBboxY: 0, dataBboxW: 76, dataBboxH: 38, dataCX: 35.5, dataCY: 19,
@@ -37,5 +33,21 @@ export default {
     type: 'path', strokeWidth: 1,
     d: 'M26.285 2.486l5.407 10.956a2.58 2.58 0 0 0 1.944 1.412l12.091 1.757c2.118.308 2.963 2.91 1.431 4.403l-8.749 8.528a2.582 2.582 0 0 0-.742 2.285l2.065 12.042c.362 2.109-1.852 3.717-3.746 2.722l-10.814-5.685a2.585 2.585 0 0 0-2.403 0l-10.814 5.685c-1.894.996-4.108-.613-3.746-2.722l2.065-12.042a2.582 2.582 0 0 0-.742-2.285L.783 21.014c-1.532-1.494-.687-4.096 1.431-4.403l12.091-1.757a2.58 2.58 0 0 0 1.944-1.412l5.407-10.956c.946-1.919 3.682-1.919 4.629 0z',
     dataBboxX: 0, dataBboxY: 0, dataBboxW: 48, dataBboxH: 47, dataCX: 24, dataCY: 23
-  }
+  },
+  common: {
+    type: 'rect', fill: 'yellow', width: '70', height: '35', x: 0, y: 0, strokeWidth: 1,
+    dataBboxX: 0, dataBboxY: 0, dataBboxW: 70, dataBboxH: 35, dataCX: 70, dataCY: 35, // cx/cy can be calculated at runtime, but I'm too lazy to do that
+  },
+  human: {
+    type: 'polygon', points: '55,0 105,70 0,70', strokeWidth: 1,
+    dataBboxX: 0, dataBboxY: 0, dataBboxW: 105, dataBboxH: 70, dataCX: 55, dataCY: 35,
+  },
+  pause: {
+    type: 'circle', cx: 0, cy: 0, strokeWidth: 1, r: 10,
+    dataBboxX: -10, dataBboxY: -10, dataBboxW: 20, dataBboxH: 20, dataCX: 0, dataCY: 0,
+  },
+  logic: {
+    type: 'diamond', strokeWidth: 1, d: "M 38 2 L 76 20 L 38 38 L 2 20 Z",
+    dataBboxX: 0, dataBboxY: 0, dataBboxW: 76, dataBboxH: 38, dataCX: 35.5, dataCY: 19,
+  },
 };
