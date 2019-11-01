@@ -1,5 +1,5 @@
 export const constants = {
-  CANVAS_LEFT_MARGIN: 164,
+  CANVAS_LEFT_MARGIN: 120,
   CANVAS_RIGHT_MARGIN: 0,
   CANVAS_TOP_MARGIN: 0,
   CANVAS_BOTTOM_MARGIN: 0,
@@ -21,8 +21,8 @@ export const constants = {
   MARKER_ARROW_HEIGHT: 9,
   SHAPE_LEADING_MARGIN: 35, // when draw a line from a point on a shape, if the line is parallel to the side on which is point is on, this margin is the distance between them.
 
-  FILL: ['#F44336', '#E91E63', '#9C27B0', '#2196F3', '#80DEEA', '#66BB6A', '#EEFF41', '#FFEB3B', '#FF9800', '#FF5722', '#BDBDBD', '#795548', '#424242'],
-  STROKE: ['#F44336', '#E91E63', '#9C27B0', '#673AB7', '#3F51B5', '#303F9F', '#0D47A1', '#006064', '#009688', '#1B5E20', '#827717', '#FF5722', '#3E2723', '#263238', '#212121'],
+  FILL: [ '#F44336', '#E91E63', '#9C27B0', '#2196F3', '#80DEEA', '#66BB6A', '#EEFF41', '#FFEB3B', '#FF9800', '#FF5722', '#BDBDBD', '#795548', '#424242' ],
+  STROKE: [ '#F44336', '#E91E63', '#9C27B0', '#673AB7', '#3F51B5', '#303F9F', '#0D47A1', '#006064', '#009688', '#1B5E20', '#827717', '#FF5722', '#3E2723', '#263238', '#212121' ],
 
   TAB_LABEL_HEIGHT: 28,
   FLOAT_WINDOW_HEADER_HEIGHT: 28, // both attribute window and chat window belong to 'float window', this window's header height

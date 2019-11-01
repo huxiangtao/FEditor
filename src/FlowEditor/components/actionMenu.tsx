@@ -1,5 +1,5 @@
 import React from "react";
-import { Button } from "antd";
+import { Button, Icon } from "antd";
 import { Map } from "immutable";
 import { TreeNode } from "../type";
 
@@ -30,6 +30,7 @@ export default function ActionMenu(props: ActionMenuProps) {
   return (
     <div style={{ position: "fixed", right: "10px", top: "5px", zIndex: 1000 }}>
       <Button type="primary" onClick={runFlow}>
+        <Icon type="play-circle" />
         Run
       </Button>
     </div>

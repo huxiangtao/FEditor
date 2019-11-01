@@ -1,18 +1,21 @@
 .panel-button {
-  background: #f6f6f6;
+  background: none;
   border: none;
   width: 68px;
   height: 36px;
-  display: inline-block;
   position: relative;
   overflow: hidden;
-  left: 2px;
-  top: 2px;
+  padding: 0;
+}
+
+.panel-button svg {
+  width: 68px;
+  height: 36px;
 }
 
 #work-space {
   position: fixed;
-  left: 165px;
+  left: 120px;
   top: 0px;
   height: 100%;
   width: 100%;
