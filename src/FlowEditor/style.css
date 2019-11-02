@@ -6,6 +6,7 @@
   position: relative;
   overflow: hidden;
   padding: 0;
+  cursor: grab;
 }
 
 .panel-button svg {
@@ -19,6 +20,10 @@
   top: 0px;
   height: 100%;
   width: 100%;
+}
+
+#work-space:focus {
+  outline: 0;
 }
 
 #work-space-svg {

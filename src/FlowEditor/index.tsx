@@ -28,11 +28,12 @@ interface FlowEditorState {
 }
 
 export default class FlowEditor extends React.Component<any, FlowEditorState> {
+  staticData: Store;
+
   constructor(props: any) {
     super(props);
     this.staticData = new Store();
   }
-  staticData: Store;
   state = {
     selectedElementID: "",
     objList: fromJS([]),
@@ -308,7 +309,6 @@ export default class FlowEditor extends React.Component<any, FlowEditorState> {
 
   onContextMenu = (e: any) => {
     // TODO:huxt add context menu
-    console.log(e.button, "e.button===");
     this.setCurMouseButton(e.button);
   };
 
@@ -316,7 +316,7 @@ export default class FlowEditor extends React.Component<any, FlowEditorState> {
     console.log(pauseId, "elliot198===");
   };
 
-  onDrop = (e: any) => {
+  onDragOver = (e: any) => {
     e.preventDefault();
   };
 
@@ -326,7 +326,6 @@ export default class FlowEditor extends React.Component<any, FlowEditorState> {
 
   render() {
     const { objList, selectedElementID, curMouseButton } = this.state;
-    console.log(curMouseButton, typeof curMouseButton, "asd");
     objList.forEach((o: any) => {
       if (!o) {
         return;
@@ -347,14 +346,21 @@ export default class FlowEditor extends React.Component<any, FlowEditorState> {
     return (
       <div>
         <Panel createShape={this.createShape} />
-        <div id="work-space" onDragOver={this.onDrop}>
+        <div
+          id="work-space"
+          tabIndex={0}
+          onKeyUpCapture={(e: any) => {
+            console.log(e, e.key, "elliot198");
+            this.keyUpHandler(e);
+          }}
+        >
           <svg
+            id="work-space-svg"
             xmlns="http://www.w3.org/2000/svg"
             xmlnsXlink="http://www.w3.org/1999/xlink"
             version="1.1"
             baseProfile="full"
-            id="work-space-svg"
-            onKeyUp={this.keyUpHandler}
+            onDragOver={this.onDragOver}
             onMouseMove={this.onMouseMove}
             onMouseDown={this.onMouseDown}
             onMouseUp={this.onMouseUp}
