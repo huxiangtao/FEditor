@@ -10,7 +10,6 @@ export default function ShapeHandler(props: ShapeHandlerProps) {
   const ele = staticData.selected;
   if (!ele) return null;
 
-  const matrix = staticData.transform.matrix;
   let placeHolderPoints = staticData.handlersPos.slice(0, 4);
   let lineConn = lineConnHandlers(ele.getBoundingClientRect());
   return (

@@ -1,5 +1,7 @@
 import BaseNode from "./BaseNode";
 import React from "react";
+import ActionMenu from "../actionMenu";
+import { Dropdown } from "antd";
 
 interface RectNodeState {
   style: any;
@@ -17,25 +19,30 @@ export default class RectNode extends BaseNode {
     const customProps = this.customPropsFactory(curElement);
     const commonStyle = this.commonStyleFactory(curElement);
     return (
-      <g
-        key={id}
-        id={id}
-        className={"svg-shape shape-container"}
-        transform={curElement.get("transform")}
-        onMouseEnter={onHover}
-        onMouseLeave={onHoverOut}
-        onContextMenuCapture={onContextMenu}
-        {...customProps}
+      <Dropdown
+        overlay={ActionMenu({ menuList: ["clone", "delete", "edit"] })}
+        trigger={["contextMenu"]}
       >
-        <rect
-          {...commonStyle}
-          x={curElement.get("x")}
-          y={curElement.get("y")}
-          className="svg-shape shape"
-          width={curElement.get("width")}
-          height={curElement.get("height")}
-        />
-      </g>
+        <g
+          key={id}
+          id={id}
+          className={"svg-shape shape-container"}
+          transform={curElement.get("transform")}
+          onMouseEnter={onHover}
+          onMouseLeave={onHoverOut}
+          onContextMenuCapture={onContextMenu}
+          {...customProps}
+        >
+          <rect
+            {...commonStyle}
+            x={curElement.get("x")}
+            y={curElement.get("y")}
+            className="svg-shape shape"
+            width={curElement.get("width")}
+            height={curElement.get("height")}
+          />
+        </g>
+      </Dropdown>
     );
   }
 }

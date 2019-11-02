@@ -1,4 +1,4 @@
-import React from "react";
+import React, { Fragment } from "react";
 import { Button } from "antd";
 import { constants } from "../constants/index";
 import "../style.css";
@@ -33,10 +33,10 @@ const shapeComponentMap = {
 export default class Panel extends React.Component<PanelProps, any> {
   state = {
     appList: [
-      { id: "app1", type: "common" },
-      { id: "app3", type: "logic" },
-      { id: "app2", type: "human" },
-      { id: "app2", type: "pause" }
+      { id: "app1", type: "common", title: "app1" },
+      { id: "app3", type: "logic", title: "判断" },
+      { id: "app2", type: "human", title: "人工" },
+      { id: "app2", type: "pause", title: "暂停" }
     ]
   };
   curCloneNode = null;
@@ -110,6 +110,7 @@ export default class Panel extends React.Component<PanelProps, any> {
                 <svg pointerEvents="none">
                   {(shapeComponentMap as any)[app.type]}
                 </svg>
+                <p style={{ position: "absolute", top: "4px" }}>{app.title}</p>
               </div>
             );
           })}

@@ -1,6 +1,8 @@
 import BaseNode from "./BaseNode";
 import React from "react";
 import _ from "lodash";
+import ActionMenu from "../actionMenu";
+import { Dropdown } from "antd";
 
 interface CircleNodeState {
   style: any;
@@ -39,27 +41,32 @@ export default class CircleNode extends BaseNode {
     const commonStyle = this.commonStyleFactory(curElement);
     const customProps = this.customPropsFactory(curElement);
     return (
-      <g
-        key={id}
-        id={id}
-        className={"svg-shape shape-container"}
-        transform={curElement.get("transform")}
-        onMouseEnter={onHover}
-        onContextMenuCapture={onContextMenu}
-        {...customProps}
+      <Dropdown
+        overlay={ActionMenu({ menuList: ["clone", "delete", "pause"] })}
+        trigger={["contextMenu"]}
       >
-        <circle
-          {...commonStyle}
-          onClick={() => {
-            this.switchPause(id);
-            (onClick as any)(id);
-          }}
-          cx={curElement.get("cx")}
-          cy={curElement.get("cy")}
-          r={curElement.get("r")}
-          className="svg-shape shape"
-        />
-      </g>
+        <g
+          key={id}
+          id={id}
+          className={"svg-shape shape-container"}
+          transform={curElement.get("transform")}
+          onMouseEnter={onHover}
+          onContextMenuCapture={onContextMenu}
+          {...customProps}
+        >
+          <circle
+            {...commonStyle}
+            onClick={() => {
+              this.switchPause(id);
+              (onClick as any)(id);
+            }}
+            cx={curElement.get("cx")}
+            cy={curElement.get("cy")}
+            r={curElement.get("r")}
+            className="svg-shape shape"
+          />
+        </g>
+      </Dropdown>
     );
   }
 }

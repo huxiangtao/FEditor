@@ -1,5 +1,7 @@
 import BaseNode from "./BaseNode";
 import React from "react";
+import ActionMenu from "../actionMenu";
+import { Dropdown } from "antd";
 
 interface DiamondNodeState {
   style: any;
@@ -17,21 +19,26 @@ export default class DiamondNode extends BaseNode {
     const commonStyle = this.commonStyleFactory(curElement);
     const customProps = this.customPropsFactory(curElement);
     return (
-      <g
-        key={id}
-        id={id}
-        className={"svg-shape shape-container"}
-        transform={curElement.get("transform")}
-        onMouseEnter={onHover}
-        onContextMenuCapture={onContextMenu}
-        {...customProps}
+      <Dropdown
+        overlay={ActionMenu({ menuList: ["clone", "delete", "edit"] })}
+        trigger={["contextMenu"]}
       >
-        <path
-          {...commonStyle}
-          className="svg-shape shape"
-          d={curElement.get("d")}
-        />
-      </g>
+        <g
+          key={id}
+          id={id}
+          className={"svg-shape shape-container"}
+          transform={curElement.get("transform")}
+          onMouseEnter={onHover}
+          onContextMenuCapture={onContextMenu}
+          {...customProps}
+        >
+          <path
+            {...commonStyle}
+            className="svg-shape shape"
+            d={curElement.get("d")}
+          />
+        </g>
+      </Dropdown>
     );
   }
 }

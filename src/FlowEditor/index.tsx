@@ -7,7 +7,6 @@ import "antd/dist/antd.css";
 import ShapeWrap from "./components/ShapeWrap";
 import _ from "lodash";
 import {
-  randomNumber,
   randomString,
   updateHandlersPos,
   optimisePath,
@@ -18,13 +17,14 @@ import regularShapes from "./regularShapes";
 import ShapeHandler from "./components/ShapeHandler";
 import "./style.css";
 import Store from "./store";
-import ActionMenu from "./components/actionMenu";
+import RunButton from "./components/runButton";
 import TestChild from "./components/TestChild";
 import { TreeNode } from "./type";
 
 interface FlowEditorState {
   selectedElementID: string;
   objList: List<any> | undefined;
+  curMouseButton: number | undefined;
 }
 
 export default class FlowEditor extends React.Component<any, FlowEditorState> {
@@ -35,7 +35,8 @@ export default class FlowEditor extends React.Component<any, FlowEditorState> {
   staticData: Store;
   state = {
     selectedElementID: "",
-    objList: fromJS([])
+    objList: fromJS([]),
+    curMouseButton: undefined
   };
 
   componentDidMount = () => {
@@ -117,6 +118,7 @@ export default class FlowEditor extends React.Component<any, FlowEditorState> {
     const target = e.target;
     const selectedEle = target.closest(".shape-container");
     this.staticData.updateStartCoordinate(e.clientX, e.clientY);
+    this.setCurMouseButton(e.button);
     if (
       selectedEle &&
       target.classList.contains("shape") &&
@@ -304,9 +306,10 @@ export default class FlowEditor extends React.Component<any, FlowEditorState> {
     }
   };
 
-  onContextMenu = () => {
+  onContextMenu = (e: any) => {
     // TODO:huxt add context menu
-    console.log("elliot130");
+    console.log(e.button, "e.button===");
+    this.setCurMouseButton(e.button);
   };
 
   onPauseClick = (pauseId: string) => {
@@ -317,8 +320,13 @@ export default class FlowEditor extends React.Component<any, FlowEditorState> {
     e.preventDefault();
   };
 
+  setCurMouseButton = (n: number) => {
+    this.setState({ curMouseButton: n });
+  };
+
   render() {
-    const { objList, selectedElementID } = this.state;
+    const { objList, selectedElementID, curMouseButton } = this.state;
+    console.log(curMouseButton, typeof curMouseButton, "asd");
     objList.forEach((o: any) => {
       if (!o) {
         return;
@@ -363,13 +371,13 @@ export default class FlowEditor extends React.Component<any, FlowEditorState> {
               }}
             />
             <g id="selector-layer">
-              {selectedElementID ? (
+              {selectedElementID && curMouseButton === 0 ? (
                 <ShapeHandler staticData={this.staticData} />
               ) : null}
             </g>
           </svg>
         </div>
-        <ActionMenu nodeMap={this.staticData.NodeMap} />
+        <RunButton nodeMap={this.staticData.NodeMap} />
         {/* <TestChild /> */}
       </div>
     );
