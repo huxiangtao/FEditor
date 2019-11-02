@@ -30,7 +30,7 @@ export default class PolyLine extends BaseLine {
           {...commonStyle}
           className="svg-shape shape polyline-shape"
           fill="none"
-          strokeWidth={1}
+          strokeWidth={1.5}
           stroke="#424242"
           points={curElement.get("points")}
           data-shape1={curElement.get("shape1")}

@@ -12,7 +12,8 @@ const commonProps = {
 
 interface PanelProps {
   createShape(type: string, id: string, position: number[]): void; //NOTE: 创建shape
-  createApp?(): void;
+  showAppForm?(): void;
+  appList: any[];
 }
 
 const shapeComponentMap = {
@@ -31,20 +32,7 @@ const shapeComponentMap = {
 };
 
 export default class Panel extends React.Component<PanelProps, any> {
-  state = {
-    appList: [
-      { id: "app1", type: "common", title: "app1" },
-      { id: "app3", type: "logic", title: "判断" },
-      { id: "app2", type: "human", title: "人工" },
-      { id: "app2", type: "pause", title: "暂停" }
-    ]
-  };
   curCloneNode = null;
-  addApp = () => {
-    // TODO:huxt 暴露给外部的创建服务接口
-    //(this.props.createApp as any)();
-    this.setState({});
-  };
 
   dragStart = (e: any) => {
     const crt = e.target.cloneNode(true);
@@ -70,7 +58,7 @@ export default class Panel extends React.Component<PanelProps, any> {
 
   render() {
     const { CANVAS_LEFT_MARGIN } = constants;
-    const { appList } = this.state;
+    const { appList } = this.props;
     const buttonContainerStyle = {
       display: "flex",
       justifyContent: "space-evenly",
@@ -92,7 +80,12 @@ export default class Panel extends React.Component<PanelProps, any> {
         }}
       >
         <p></p>
-        <Button type="primary" icon="plus" size="small" onClick={this.addApp}>
+        <Button
+          type="primary"
+          icon="plus"
+          size="small"
+          onClick={this.props.showAppForm}
+        >
           Add App
         </Button>
         <div style={buttonContainerStyle}>
@@ -110,7 +103,7 @@ export default class Panel extends React.Component<PanelProps, any> {
                 <svg pointerEvents="none">
                   {(shapeComponentMap as any)[app.type]}
                 </svg>
-                <p style={{ position: "absolute", top: "4px" }}>{app.title}</p>
+                <p style={{ position: "absolute", top: "4px" }}>{app.name}</p>
               </div>
             );
           })}

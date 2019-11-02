@@ -35,7 +35,7 @@ export default {
     dataBboxX: 0, dataBboxY: 0, dataBboxW: 48, dataBboxH: 47, dataCX: 24, dataCY: 23
   },
   common: {
-    type: 'rect', fill: 'yellow', width: '70', height: '35', x: 0, y: 0, strokeWidth: 1,
+    type: 'rect', fill: '#FFF', width: '70', height: '35', x: 0, y: 0, strokeWidth: 1, stroke: '#000',
     dataBboxX: 0, dataBboxY: 0, dataBboxW: 70, dataBboxH: 35, dataCX: 70, dataCY: 35, // cx/cy can be calculated at runtime, but I'm too lazy to do that
   },
   human: {

@@ -20,11 +20,14 @@ import Store from "./store";
 import RunButton from "./components/runButton";
 import TestChild from "./components/TestChild";
 import { TreeNode } from "./type";
+import CreateApp from "./components/createApp";
 
 interface FlowEditorState {
   selectedElementID: string;
   objList: List<any> | undefined;
   curMouseButton: number | undefined;
+  modalVisible: boolean;
+  appList: any[];
 }
 
 export default class FlowEditor extends React.Component<any, FlowEditorState> {
@@ -37,7 +40,14 @@ export default class FlowEditor extends React.Component<any, FlowEditorState> {
   state = {
     selectedElementID: "",
     objList: fromJS([]),
-    curMouseButton: undefined
+    curMouseButton: undefined,
+    modalVisible: false,
+    appList: [
+      { id: "app1", type: "common", name: "app1" },
+      { id: "app3", type: "logic", name: "判断" },
+      { id: "app2", type: "human", name: "人工" },
+      { id: "app2", type: "pause", name: "暂停" }
+    ]
   };
 
   componentDidMount = () => {
@@ -253,16 +263,11 @@ export default class FlowEditor extends React.Component<any, FlowEditorState> {
 
   createShape = (type: string, id: string, position: number[]) => {
     const { objList } = this.state;
-    const { FILL, STROKE } = constants;
     const matrix = [1, 0, 0, 1, position[0], position[1]];
     const newShape = (regularShapes as any)[type];
-    const fill = FILL[Math.floor(Math.random() * FILL.length)];
-    const stroke = STROKE[Math.floor(Math.random() * STROKE.length)];
     const shapeId = `${id}_${randomString(12)}`;
     const customProps = {
       id: shapeId,
-      fill,
-      stroke,
       transform: `matrix(${matrix.join(" ")})`
     };
     Object.assign(newShape, customProps);
@@ -324,8 +329,27 @@ export default class FlowEditor extends React.Component<any, FlowEditorState> {
     this.setState({ curMouseButton: n });
   };
 
+  handleCancel = () => {
+    this.setState({
+      modalVisible: false
+    });
+  };
+
+  showAppForm = () => {
+    this.setState({
+      modalVisible: true
+    });
+  };
+
+  createApp = (app: any) => {
+    const { appList } = this.state;
+    this.setState({
+      appList: [...appList, app]
+    });
+  };
+
   render() {
-    const { objList, selectedElementID, curMouseButton } = this.state;
+    const { objList, selectedElementID, curMouseButton, appList } = this.state;
     objList.forEach((o: any) => {
       if (!o) {
         return;
@@ -345,7 +369,11 @@ export default class FlowEditor extends React.Component<any, FlowEditorState> {
     });
     return (
       <div>
-        <Panel createShape={this.createShape} />
+        <Panel
+          createShape={this.createShape}
+          showAppForm={this.showAppForm}
+          appList={appList}
+        />
         <div
           id="work-space"
           tabIndex={0}
@@ -384,6 +412,11 @@ export default class FlowEditor extends React.Component<any, FlowEditorState> {
           </svg>
         </div>
         <RunButton nodeMap={this.staticData.NodeMap} />
+        <CreateApp
+          modalVisible={this.state.modalVisible}
+          handleCancel={this.handleCancel}
+          createApp={this.createApp}
+        />
         {/* <TestChild /> */}
       </div>
     );
