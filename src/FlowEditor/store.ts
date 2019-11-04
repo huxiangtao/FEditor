@@ -4,8 +4,9 @@ import {
 } from "./utils";
 import { fromJS, Map } from "immutable";
 import _ from "lodash";
+import TreeNode from './TreeNode';
+import Line from './Line';
 import { constants } from "./constants/index";
-import { TreeNode } from "./type";
 interface AttachedItem {
   lines: Set<any>
   text: string
@@ -18,6 +19,7 @@ export default class Store {
   constructor () {
     this.attached = {};
     this.NodeMap = fromJS( {} )
+    this.LineMap = fromJS( {} )
   }
 
   selected: any
@@ -27,6 +29,8 @@ export default class Store {
   Node = {};
 
   NodeMap: Map<string, TreeNode>
+
+  LineMap: Map<string, Line>
 
   selector: any
 
@@ -58,7 +62,13 @@ export default class Store {
   bbox = { x: 0, y: 0, w: 0, h: 0 }
 
   createNode( id: string ) {
-    this.NodeMap = this.NodeMap.set( id, { id, nextNodes: fromJS( {} ), preNodes: fromJS( {} ) } )
+    this.NodeMap = this.NodeMap.set( id, new TreeNode( id, fromJS( {} ), fromJS( {} ), fromJS( {} ), fromJS( {} ) ) );
+  }
+
+  createLine( id: string, frId: string, toId: string ) {
+    const frObj = this.NodeMap.get( frId );
+    const toObj = this.NodeMap.get( toId );
+    this.LineMap = this.LineMap.set( id, new Line( id, frObj as TreeNode, toObj as TreeNode ) )
   }
 
   // TODO:huxt get root node of the flow
@@ -66,12 +76,20 @@ export default class Store {
     return this.NodeMap.size > 0 ? this.NodeMap.first() : null;
   }
 
-  linkNode( fromId: string, to: TreeNode ) {
-    const toId = to.id;
-    const nextNodes = ( this.NodeMap.get( fromId ) as TreeNode ).nextNodes;
-    const preNodes = ( this.NodeMap.get( toId ) as TreeNode ).preNodes;
-    ( this.NodeMap.get( fromId ) as TreeNode ).nextNodes = ( nextNodes as Map<string, TreeNode> ).set( toId, to );
-    ( this.NodeMap.get( toId ) as TreeNode ).preNodes = ( preNodes as Map<string, TreeNode> ).set( fromId, this.NodeMap.get( fromId ) as TreeNode );
+  linkNode( fromId: string, toId: string, lineId: string ) {
+    const fromInstance = this.NodeMap.get( fromId )
+    const toInstance = this.NodeMap.get( toId )
+    const nextNodes = ( fromInstance as TreeNode ).nextNodes;
+    const preNodes = ( toInstance as TreeNode ).preNodes;
+    const nextLines = ( fromInstance as TreeNode ).nextLines;
+    const preLines = ( toInstance as TreeNode ).preLines;
+    const lineInstance = this.LineMap.get( lineId );
+    // linkNode
+    ( fromInstance as TreeNode ).nextNodes = nextNodes.set( toId, toInstance as TreeNode );
+    ( toInstance as TreeNode ).preNodes = preNodes.set( fromId, fromInstance as TreeNode );
+    // linkLine
+    ( fromInstance as TreeNode ).nextLines = nextLines.set( lineId, lineInstance as Line );
+    ( toInstance as TreeNode ).preLines = preLines.set( lineId, lineInstance as Line );
   }
 
   getNode( id: string ) {

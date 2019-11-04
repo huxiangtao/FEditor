@@ -1,6 +1,5 @@
 import React from "react";
 import { fromJS, List } from "immutable";
-import { constants } from "./constants/index";
 import BackGround from "./components/BackGround";
 import Panel from "./components/Panel";
 import "antd/dist/antd.css";
@@ -19,7 +18,6 @@ import "./style.css";
 import Store from "./store";
 import RunButton from "./components/runButton";
 import TestChild from "./components/TestChild";
-import { TreeNode } from "./type";
 import CreateApp from "./components/createApp";
 
 interface FlowEditorState {
@@ -28,6 +26,8 @@ interface FlowEditorState {
   curMouseButton: number | undefined;
   modalVisible: boolean;
   appList: any[];
+  transDataPointMap: Map<string, boolean>;
+  taskStateMap: Map<string, string>;
 }
 
 export default class FlowEditor extends React.Component<any, FlowEditorState> {
@@ -47,7 +47,9 @@ export default class FlowEditor extends React.Component<any, FlowEditorState> {
       { id: "app3", type: "logic", name: "判断" },
       { id: "app2", type: "human", name: "人工" },
       { id: "app2", type: "pause", name: "暂停" }
-    ]
+    ],
+    transDataPointMap: fromJS({}),
+    taskStateMap: fromJS({})
   };
 
   componentDidMount = () => {
@@ -227,11 +229,16 @@ export default class FlowEditor extends React.Component<any, FlowEditorState> {
               (hoveredEle as any).closest(".shape-container").id,
               this.staticData.drawLine.id
             ); // NOTE: add line obj to target shape lines Set
+            this.staticData.createLine(
+              this.staticData.drawLine.id,
+              selectedElementID,
+              hoveredEleID
+            );
             this.staticData.linkNode(
               selectedElementID,
-              this.staticData.NodeMap.get(hoveredEleID) as TreeNode
+              hoveredEleID,
+              this.staticData.drawLine.id
             );
-            //console.log(this.staticData.NodeMap, "staticData");
           }
         } else {
           // NOTE: remove no target shape line
@@ -348,8 +355,30 @@ export default class FlowEditor extends React.Component<any, FlowEditorState> {
     });
   };
 
+  broadCastLineState = (lineId: string, state: boolean) => {
+    //广播完成任务的node id
+    const { transDataPointMap } = this.state;
+    this.setState({
+      transDataPointMap: transDataPointMap.set(lineId, state)
+    });
+  };
+
+  broadCastTaskState = (nodeId: string, state: string) => {
+    const { taskStateMap } = this.state;
+    this.setState({
+      taskStateMap: taskStateMap.set(nodeId, state)
+    });
+  };
+
   render() {
-    const { objList, selectedElementID, curMouseButton, appList } = this.state;
+    const {
+      objList,
+      selectedElementID,
+      curMouseButton,
+      appList,
+      transDataPointMap,
+      taskStateMap
+    } = this.state;
     objList.forEach((o: any) => {
       if (!o) {
         return;
@@ -374,14 +403,7 @@ export default class FlowEditor extends React.Component<any, FlowEditorState> {
           showAppForm={this.showAppForm}
           appList={appList}
         />
-        <div
-          id="work-space"
-          tabIndex={0}
-          onKeyUpCapture={(e: any) => {
-            console.log(e, e.key, "elliot198");
-            this.keyUpHandler(e);
-          }}
-        >
+        <div id="work-space" tabIndex={0} onKeyUpCapture={this.keyUpHandler}>
           <svg
             id="work-space-svg"
             xmlns="http://www.w3.org/2000/svg"
@@ -397,6 +419,8 @@ export default class FlowEditor extends React.Component<any, FlowEditorState> {
             <ShapeWrap
               selectedElementID={selectedElementID}
               objList={objList}
+              transDataPointMap={transDataPointMap}
+              taskStateMap={taskStateMap}
               staticData={this.staticData}
               handlers={{
                 onHover: this.onHover,
@@ -411,7 +435,12 @@ export default class FlowEditor extends React.Component<any, FlowEditorState> {
             </g>
           </svg>
         </div>
-        <RunButton nodeMap={this.staticData.NodeMap} />
+        <RunButton
+          nodeMap={this.staticData.NodeMap}
+          taskStateMap={taskStateMap}
+          broadCastTaskState={this.broadCastTaskState}
+          broadCastLineState={this.broadCastLineState}
+        />
         <CreateApp
           modalVisible={this.state.modalVisible}
           handleCancel={this.handleCancel}

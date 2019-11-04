@@ -10,10 +10,18 @@ interface ShapeWraperProps {
   staticData: any;
   handlers: any;
   selectedElementID?: string;
+  transDataPointMap?: Map<string, boolean>;
+  taskStateMap?: Map<string, string>;
 }
 
 export default function ShapeWrap(props: ShapeWraperProps) {
-  const { objList, staticData, handlers } = props;
+  const {
+    objList,
+    staticData,
+    handlers,
+    transDataPointMap,
+    taskStateMap
+  } = props;
   return (
     <g className="all-shape-wrapper">
       {objList.map(o => {
@@ -36,6 +44,7 @@ export default function ShapeWrap(props: ShapeWraperProps) {
               <RectNode
                 id={o.get("id")}
                 curElement={o}
+                taskStateMap={taskStateMap}
                 onHover={handlers.onHover}
                 onContextMenu={handlers.onContextMenu}
               />
@@ -55,6 +64,7 @@ export default function ShapeWrap(props: ShapeWraperProps) {
               <DiamondNode
                 id={o.get("id")}
                 curElement={o}
+                taskStateMap={taskStateMap}
                 onHover={handlers.onHover}
                 onContextMenu={handlers.onContextMenu}
               />
@@ -73,6 +83,7 @@ export default function ShapeWrap(props: ShapeWraperProps) {
                 id={o.get("id")}
                 curElement={o}
                 staticData={staticData}
+                transDataPointMap={transDataPointMap}
               />
             );
             break;

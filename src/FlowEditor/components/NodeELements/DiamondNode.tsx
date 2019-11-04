@@ -20,7 +20,7 @@ export default class DiamondNode extends BaseNode {
     const customProps = this.customPropsFactory(curElement);
     return (
       <Dropdown
-        overlay={ActionMenu({ menuList: ["clone", "delete", "edit"] })}
+        overlay={ActionMenu({ menuList: ["delete", "edit"] })}
         trigger={["contextMenu"]}
       >
         <g

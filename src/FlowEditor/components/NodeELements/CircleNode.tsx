@@ -42,7 +42,7 @@ export default class CircleNode extends BaseNode {
     const customProps = this.customPropsFactory(curElement);
     return (
       <Dropdown
-        overlay={ActionMenu({ menuList: ["clone", "delete", "pause"] })}
+        overlay={ActionMenu({ menuList: ["delete", "pause"] })}
         trigger={["contextMenu"]}
       >
         <g
