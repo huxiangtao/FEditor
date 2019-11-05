@@ -1,6 +1,6 @@
 import React from "react";
 import { generateCustomProps, generateCommonStyle } from "../../utils";
-import TreeNode from "../../TreeNode";
+import { TreeNode } from "../../TreeNode";
 import PauseNode from "../../PauseNode";
 import { Map } from "immutable";
 

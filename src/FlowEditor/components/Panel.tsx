@@ -11,7 +11,12 @@ const commonProps = {
 };
 
 interface PanelProps {
-  createShape(type: string, id: string, position: number[]): void; //NOTE: 创建shape
+  createShape(
+    type: string,
+    id: string,
+    title: string,
+    position: number[]
+  ): void; //NOTE: 创建shape
   showAppForm?(): void;
   appList: any[];
 }
@@ -45,11 +50,11 @@ export default class Panel extends React.Component<PanelProps, any> {
     this.curCloneNode = crt;
   };
 
-  dragEnd = (e: any, id: string, type: string) => {
+  dragEnd = (e: any, id: string, type: string, title: string) => {
     const { CANVAS_LEFT_MARGIN } = constants;
     const { createShape } = this.props;
     if (e.clientX > CANVAS_LEFT_MARGIN) {
-      createShape(type, id, [e.clientX - CANVAS_LEFT_MARGIN, e.clientY]);
+      createShape(type, id, title, [e.clientX - CANVAS_LEFT_MARGIN, e.clientY]);
     }
     if (this.curCloneNode) {
       document.body.removeChild(this.curCloneNode as any);
@@ -94,7 +99,7 @@ export default class Panel extends React.Component<PanelProps, any> {
               <div
                 onDragStart={this.dragStart}
                 onDragEnd={(e: any) => {
-                  this.dragEnd(e, app.id, app.type);
+                  this.dragEnd(e, app.id, app.type, app.name);
                 }}
                 draggable={true}
                 key={app.id}

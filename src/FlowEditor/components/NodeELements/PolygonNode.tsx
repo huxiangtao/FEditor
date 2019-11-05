@@ -3,7 +3,7 @@ import React, { Fragment } from "react";
 import { Dropdown, Modal, Radio } from "antd";
 import { Map } from "immutable";
 import ActionMenu from "../actionMenu";
-import TreeNode from "../../TreeNode";
+import { TreeNode } from "../../TreeNode";
 import PauseNode from "../../PauseNode";
 import RunTaskHoc from "../RunTaskHoc";
 

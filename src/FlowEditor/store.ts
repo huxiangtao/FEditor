@@ -4,8 +4,9 @@ import {
 } from "./utils";
 import { fromJS, Map } from "immutable";
 import _ from "lodash";
-import TreeNode from './TreeNode';
+import { TreeNode, Config } from './TreeNode';
 import PauseNode from './PauseNode';
+import LogicNode from './LogicNode';
 import Line from './Line';
 import { constants } from "./constants/index";
 interface AttachedItem {
@@ -64,17 +65,20 @@ export default class Store {
 
   bbox = { x: 0, y: 0, w: 0, h: 0 }
 
-  createNode( id: string, type: string ) {
+  createNode( id: string, type: string, config?: Config ) {
     let newNode;
     switch ( type ) {
       case 'pause':
-        newNode = new PauseNode( id, 'pause', fromJS( {} ), fromJS( {} ), fromJS( {} ), fromJS( {} ) );
+        newNode = new PauseNode( id, 'pause', fromJS( {} ), fromJS( {} ), fromJS( {} ), fromJS( {} ), config );
         break;
       case 'human':
-        newNode = new TreeNode( id, 'human', fromJS( {} ), fromJS( {} ), fromJS( {} ), fromJS( {} ) );
+        newNode = new TreeNode( id, 'human', fromJS( {} ), fromJS( {} ), fromJS( {} ), fromJS( {} ), config );
+        break;
+      case 'logic':
+        newNode = new LogicNode( id, 'logic', fromJS( {} ), fromJS( {} ), fromJS( {} ), fromJS( {} ), config );
         break;
       default:
-        newNode = new TreeNode( id, 'task', fromJS( {} ), fromJS( {} ), fromJS( {} ), fromJS( {} ) );
+        newNode = new TreeNode( id, 'task', fromJS( {} ), fromJS( {} ), fromJS( {} ), fromJS( {} ), config );
     }
     this.NodeMap = this.NodeMap.set( id, newNode );
   }
@@ -83,11 +87,6 @@ export default class Store {
     const frObj = this.NodeMap.get( frId );
     const toObj = this.NodeMap.get( toId );
     this.LineMap = this.LineMap.set( id, new Line( id, frObj as TreeNode, toObj as TreeNode ) )
-  }
-
-  // TODO:huxt get root node of the flow
-  getRootNode() {
-    return this.NodeMap.size > 0 ? this.NodeMap.first() : null;
   }
 
   linkNode( fromId: string, toId: string, lineId: string ) {
@@ -121,6 +120,27 @@ export default class Store {
       this.updateHandlerPos( select );
     }
 
+  }
+
+  validate( frId: string, toId: string ) {
+    if ( frId === toId ) {
+      return false;
+    }
+    const frNode = this.getNode( frId );
+    const toNode = this.getNode( toId );
+    const toNodeInputsNum = _.get( toNode, 'config.inputsNum' );
+    const frNodeOutputsNum = _.get( frNode, 'config.outputsNum' );
+    const preLinesSize = ( toNode as TreeNode ).preLines.size;
+    const nextLinesSize = ( frNode as TreeNode ).nextLines.size;
+    if ( toNodeInputsNum ) {
+      return toNodeInputsNum > preLinesSize;
+    }
+
+    if ( frNodeOutputsNum ) {
+      return frNodeOutputsNum > nextLinesSize;
+    }
+
+    return true;
   }
 
   updateStartCoordinate( x: number, y: number ) {

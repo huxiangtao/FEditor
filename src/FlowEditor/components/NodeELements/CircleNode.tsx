@@ -5,7 +5,7 @@ import { Map } from "immutable";
 import ActionMenu from "../actionMenu";
 import { Dropdown } from "antd";
 import RunTaskHoc from "../RunTaskHoc";
-import TreeNode from "../../TreeNode";
+import { TreeNode } from "../../TreeNode";
 import PauseNode from "../../PauseNode";
 
 interface CircleNodeState {
