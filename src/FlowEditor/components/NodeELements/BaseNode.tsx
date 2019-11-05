@@ -1,8 +1,9 @@
 import React from "react";
 import { generateCustomProps, generateCommonStyle } from "../../utils";
-import TreeNode from "../../TreeNode";
+import { TreeNode } from "../../TreeNode";
 import PauseNode from "../../PauseNode";
 import { Map } from "immutable";
+import LogicNode from "../../LogicNode";
 
 interface BaseNodeProps {
   id: string;
@@ -10,11 +11,14 @@ interface BaseNodeProps {
   curElement: any;
   staticData?: any;
   taskStateMap?: Map<string, string>;
-  nodeMap?: Map<string, TreeNode | PauseNode>;
-  recurRunTask?(id: string, nodeMap: Map<string, TreeNode | PauseNode>): void;
+  nodeMap?: Map<string, TreeNode | PauseNode | LogicNode>;
+  recurRunTask?(
+    id: string,
+    nodeMap: Map<string, TreeNode | PauseNode | LogicNode>
+  ): void;
   checkPreDone?(
     curNodeId: string,
-    nodeMap: Map<string, TreeNode | PauseNode>
+    nodeMap: Map<string, TreeNode | PauseNode | LogicNode>
   ): boolean;
   onHover?: (e: any) => void;
   onHoverOut?: (e: any) => void;

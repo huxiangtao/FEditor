@@ -59,25 +59,27 @@ export default class PolyLine extends BaseLine {
             const from = dis && dis["x"] ? curPos[0] : curPos[1];
             const to = dis && dis["x"] ? nextPos[0] : nextPos[1];
             return (
-              <circle
-                {...commonStyle}
-                fill="red"
-                cx={curPos[0]}
-                cy={curPos[1]}
-                r="5"
-                data-line-id={`${id}_animatepoints_${i}`}
-                className={`svg-shape shape animatepoints`}
-              >
-                <animate
-                  attributeName={attrName}
-                  attributeType="XML"
-                  from={from}
-                  to={to}
-                  begin="0s"
-                  dur="4s"
-                  repeatDur="indefinite"
-                />
-              </circle>
+              nextPointsPos && (
+                <circle
+                  {...commonStyle}
+                  fill="red"
+                  cx={curPos[0]}
+                  cy={curPos[1]}
+                  r="5"
+                  data-line-id={`${id}_animatepoints_${i}`}
+                  className={`svg-shape shape animatepoints`}
+                >
+                  <animate
+                    attributeName={attrName}
+                    attributeType="XML"
+                    from={from}
+                    to={to}
+                    begin="0s"
+                    dur="4s"
+                    repeatDur="indefinite"
+                  />
+                </circle>
+              )
             );
           })}
       </g>

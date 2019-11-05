@@ -1,12 +1,17 @@
 import BaseNode from "./BaseNode";
 import React from "react";
 import ActionMenu from "../actionMenu";
+import { Map } from "immutable";
 import { Dropdown } from "antd";
 
 interface LogicNodeState {
   style: any;
   title: string;
 }
+const fillType = {
+  running: "yellow",
+  done: "red"
+};
 export default class LogicNode extends BaseNode {
   state: LogicNodeState = {
     style: {},
@@ -15,9 +20,13 @@ export default class LogicNode extends BaseNode {
 
   render() {
     const { style, title } = this.state;
-    const { id, onHover, curElement, onContextMenu } = this.props;
+    const { id, onHover, curElement, onContextMenu, taskStateMap } = this.props;
     const commonStyle = this.commonStyleFactory(curElement);
     const customProps = this.customPropsFactory(curElement);
+    const nodeState = (taskStateMap as Map<string, string>).get(id);
+    const fill = (fillType as any)[nodeState as string]
+      ? (fillType as any)[nodeState as string]
+      : "#fff";
     return (
       <Dropdown
         overlay={ActionMenu({ menuList: ["delete", "edit"], type: "logic" })}
@@ -34,9 +43,21 @@ export default class LogicNode extends BaseNode {
         >
           <path
             {...commonStyle}
+            fill={fill}
             className="svg-shape shape"
             d={curElement.get("d")}
           />
+          <foreignObject width="80" height="45">
+            <p
+              style={{
+                fontSize: "12px",
+                lineHeight: "40px",
+                color: "#000"
+              }}
+            >
+              {curElement.get("title")}
+            </p>
+          </foreignObject>
         </g>
       </Dropdown>
     );
