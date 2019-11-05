@@ -1,65 +1,76 @@
 import BaseNode from "./BaseNode";
 import React from "react";
 import _ from "lodash";
+import { Map } from "immutable";
+import ActionMenu from "../actionMenu";
+import { Dropdown } from "antd";
+import RunTaskHoc from "../RunTaskHoc";
+import TreeNode from "../../TreeNode";
+import PauseNode from "../../PauseNode";
 
 interface CircleNodeState {
   style: any;
   title: string;
 }
-export default class CircleNode extends BaseNode {
+class CircleNode extends BaseNode {
   state: CircleNodeState = {
     style: {},
     title: "CircleNode"
   };
 
-  switchPause = (id: string) => {
-    const { staticData } = this.props;
-    const attached = _.get(staticData, "attached");
-    const lines = _.get(attached, `${id}.lines`);
-    for (let lineId of lines) {
-      const lineElement = document.getElementById(`${lineId}`);
-      const points = (lineElement as any).querySelectorAll(".animatepoints");
-      _.forEach(points, v => {
-        const pointId = v.getAttribute("data-line-id");
-        if (pointId.indexOf(lineId) > -1) {
-          const visibility = v.getAttribute("visibility");
-          if (visibility === "visible") {
-            v.setAttribute("visibility", "hidden");
-          } else {
-            v.setAttribute("visibility", "visible");
-          }
-        }
-      });
-    }
-  };
-
   render() {
     const { style, title } = this.state;
-    const { id, onHover, onContextMenu, curElement, onClick } = this.props;
+    const {
+      id,
+      onHover,
+      onContextMenu,
+      curElement,
+      nodeMap,
+      recurRunTask
+    } = this.props;
     const commonStyle = this.commonStyleFactory(curElement);
     const customProps = this.customPropsFactory(curElement);
     return (
-      <g
-        key={id}
-        id={id}
-        className={"svg-shape shape-container"}
-        transform={curElement.get("transform")}
-        onMouseEnter={onHover}
-        onContextMenuCapture={onContextMenu}
-        {...customProps}
+      <Dropdown
+        overlay={ActionMenu({
+          menuList: ["delete", "start"],
+          type: "pause",
+          onClick: type => {
+            if (type === "pause") {
+              (recurRunTask as (
+                id: string,
+                nodeMap: Map<string, TreeNode | PauseNode>,
+                trigger?: boolean
+              ) => void)(
+                id,
+                nodeMap as Map<string, TreeNode | PauseNode>,
+                true
+              );
+            }
+          }
+        })}
+        trigger={["contextMenu"]}
       >
-        <circle
-          {...commonStyle}
-          onClick={() => {
-            this.switchPause(id);
-            (onClick as any)(id);
-          }}
-          cx={curElement.get("cx")}
-          cy={curElement.get("cy")}
-          r={curElement.get("r")}
-          className="svg-shape shape"
-        />
-      </g>
+        <g
+          key={id}
+          id={id}
+          className={"svg-shape shape-container"}
+          transform={curElement.get("transform")}
+          onMouseEnter={onHover}
+          onContextMenuCapture={onContextMenu}
+          {...customProps}
+        >
+          <circle
+            {...commonStyle}
+            cx={curElement.get("cx")}
+            cy={curElement.get("cy")}
+            r={curElement.get("r")}
+            className="svg-shape shape"
+          />
+        </g>
+      </Dropdown>
     );
   }
 }
+
+export default RunTaskHoc(CircleNode);

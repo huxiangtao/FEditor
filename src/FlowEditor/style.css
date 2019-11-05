@@ -1,16 +1,21 @@
 .panel-button {
   background: none;
   border: none;
-  width: 68px;
-  height: 36px;
+  width: 80px;
+  height: 40px;
   position: relative;
   overflow: hidden;
   padding: 0;
+  cursor: grab;
 }
 
 .panel-button svg {
-  width: 68px;
-  height: 36px;
+  width: 80px;
+  height: 40px;
+}
+
+.shape-container {
+  cursor: grab;
 }
 
 #work-space {
@@ -19,4 +24,20 @@
   top: 0px;
   height: 100%;
   width: 100%;
+}
+
+#work-space:focus {
+  outline: 0;
+}
+
+#work-space-svg {
+  height: 100%;
+  width: 100%;
+}
+
+.drag-holder {
+  background: none;
+  position: absolute;
+  top: 0px;
+  left: -100px;
 }

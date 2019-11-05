@@ -1,13 +1,11 @@
 import React from "react";
 import { fromJS, List } from "immutable";
-import { constants } from "./constants/index";
 import BackGround from "./components/BackGround";
 import Panel from "./components/Panel";
 import "antd/dist/antd.css";
 import ShapeWrap from "./components/ShapeWrap";
 import _ from "lodash";
 import {
-  randomNumber,
   randomString,
   updateHandlersPos,
   optimisePath,
@@ -18,24 +16,40 @@ import regularShapes from "./regularShapes";
 import ShapeHandler from "./components/ShapeHandler";
 import "./style.css";
 import Store from "./store";
-import ActionMenu from "./components/actionMenu";
+import RunButton from "./components/runButton";
 import TestChild from "./components/TestChild";
-import { TreeNode } from "./type";
+import CreateApp from "./components/createApp";
 
 interface FlowEditorState {
   selectedElementID: string;
   objList: List<any> | undefined;
+  curMouseButton: number | undefined;
+  modalVisible: boolean;
+  appList: any[];
+  transDataPointMap: Map<string, boolean>;
+  taskStateMap: Map<string, string>;
 }
 
 export default class FlowEditor extends React.Component<any, FlowEditorState> {
+  staticData: Store;
+
   constructor(props: any) {
     super(props);
     this.staticData = new Store();
   }
-  staticData: Store;
   state = {
     selectedElementID: "",
-    objList: fromJS([])
+    objList: fromJS([]),
+    curMouseButton: undefined,
+    modalVisible: false,
+    appList: [
+      { id: "app1", type: "task", name: "app1" },
+      { id: "app2", type: "logic", name: "判断" },
+      { id: "app3", type: "human", name: "人工" },
+      { id: "app4", type: "pause", name: "暂停" }
+    ],
+    transDataPointMap: fromJS({}),
+    taskStateMap: fromJS({})
   };
 
   componentDidMount = () => {
@@ -117,6 +131,7 @@ export default class FlowEditor extends React.Component<any, FlowEditorState> {
     const target = e.target;
     const selectedEle = target.closest(".shape-container");
     this.staticData.updateStartCoordinate(e.clientX, e.clientY);
+    this.setCurMouseButton(e.button);
     if (
       selectedEle &&
       target.classList.contains("shape") &&
@@ -198,7 +213,7 @@ export default class FlowEditor extends React.Component<any, FlowEditorState> {
           const hoveredEleID = (hoveredEle as any).closest(".shape-container")
             .id;
           if (hoveredEleID === selectedElementID) {
-            this.removeShape(this.staticData.drawLine.id);
+            this.removeShape(lineId);
             this.staticData.resetDrawLineId();
           } else {
             const toRect = this.staticData.getToRec(hoveredEle);
@@ -212,17 +227,14 @@ export default class FlowEditor extends React.Component<any, FlowEditorState> {
               .setAttribute("data-shape2", hoveredEleID); // NOTE: set target shape of the line
             this.staticData.addLineMap(
               (hoveredEle as any).closest(".shape-container").id,
-              this.staticData.drawLine.id
+              lineId
             ); // NOTE: add line obj to target shape lines Set
-            this.staticData.linkNode(
-              selectedElementID,
-              this.staticData.NodeMap.get(hoveredEleID) as TreeNode
-            );
-            //console.log(this.staticData.NodeMap, "staticData");
+            this.staticData.createLine(lineId, selectedElementID, hoveredEleID);
+            this.staticData.linkNode(selectedElementID, hoveredEleID, lineId);
           }
         } else {
           // NOTE: remove no target shape line
-          this.removeShape(this.staticData.drawLine.id);
+          this.removeShape(lineId);
         }
         break;
       default:
@@ -248,24 +260,18 @@ export default class FlowEditor extends React.Component<any, FlowEditorState> {
     this.staticData.resetActionType();
   };
 
-  createShape = (e: any) => {
+  createShape = (type: string, id: string, position: number[]) => {
     const { objList } = this.state;
-    const { FILL, STROKE } = constants;
-    const matrix = [1, 0, 0, 1, randomNumber(0, 800), randomNumber(0, 480)];
-    const type: string = e.target.id.split("-")[1];
-    const id = randomString(12);
+    const matrix = [1, 0, 0, 1, position[0], position[1]];
     const newShape = (regularShapes as any)[type];
-    const fill = FILL[Math.floor(Math.random() * FILL.length)];
-    const stroke = STROKE[Math.floor(Math.random() * STROKE.length)];
+    const shapeId = `${id}_${randomString(12)}`;
     const customProps = {
-      id,
-      fill,
-      stroke,
+      id: shapeId,
       transform: `matrix(${matrix.join(" ")})`
     };
     Object.assign(newShape, customProps);
     // set new node int NodeMap
-    this.staticData.createNode(id);
+    this.staticData.createNode(shapeId, type);
     this.setState({
       objList: objList.push(fromJS(newShape))
     });
@@ -305,17 +311,62 @@ export default class FlowEditor extends React.Component<any, FlowEditorState> {
     }
   };
 
-  onContextMenu = () => {
+  onContextMenu = (e: any) => {
     // TODO:huxt add context menu
-    console.log("elliot130");
+    this.setCurMouseButton(e.button);
   };
 
-  onPauseClick = (pauseId: string) => {
-    console.log(pauseId, "elliot198===");
+  onDragOver = (e: any) => {
+    e.preventDefault();
+  };
+
+  setCurMouseButton = (n: number) => {
+    this.setState({ curMouseButton: n });
+  };
+
+  handleCancel = () => {
+    this.setState({
+      modalVisible: false
+    });
+  };
+
+  showAppForm = () => {
+    this.setState({
+      modalVisible: true
+    });
+  };
+
+  createApp = (app: any) => {
+    const { appList } = this.state;
+    this.setState({
+      appList: [...appList, app]
+    });
+  };
+
+  broadCastLineState = (lineId: string, state: boolean) => {
+    //广播完成任务的node id
+    const { transDataPointMap } = this.state;
+    this.setState({
+      transDataPointMap: transDataPointMap.set(lineId, state)
+    });
+  };
+
+  broadCastTaskState = (nodeId: string, state: string) => {
+    const { taskStateMap } = this.state;
+    this.setState({
+      taskStateMap: taskStateMap.set(nodeId, state)
+    });
   };
 
   render() {
-    const { objList, selectedElementID } = this.state;
+    const {
+      objList,
+      selectedElementID,
+      curMouseButton,
+      appList,
+      transDataPointMap,
+      taskStateMap
+    } = this.state;
     objList.forEach((o: any) => {
       if (!o) {
         return;
@@ -335,37 +386,55 @@ export default class FlowEditor extends React.Component<any, FlowEditorState> {
     });
     return (
       <div>
-        <Panel createShape={this.createShape} />
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          xmlnsXlink="http://www.w3.org/1999/xlink"
-          id="work-space"
-          version="1.1"
-          baseProfile="full"
-          tabIndex={0}
-          onKeyUp={this.keyUpHandler}
-          onMouseMove={this.onMouseMove}
-          onMouseDown={this.onMouseDown}
-          onMouseUp={this.onMouseUp}
-        >
-          <BackGround />
-          <ShapeWrap
-            selectedElementID={selectedElementID}
-            objList={objList}
-            staticData={this.staticData}
-            handlers={{
-              onHover: this.onHover,
-              onPauseClick: this.onPauseClick,
-              onContextMenu: this.onContextMenu
-            }}
-          />
-          <g id="selector-layer">
-            {selectedElementID ? (
-              <ShapeHandler staticData={this.staticData} />
-            ) : null}
-          </g>
-        </svg>
-        <ActionMenu nodeMap={this.staticData.NodeMap} />
+        <Panel
+          createShape={this.createShape}
+          showAppForm={this.showAppForm}
+          appList={appList}
+        />
+        <div id="work-space" tabIndex={0} onKeyUpCapture={this.keyUpHandler}>
+          <svg
+            id="work-space-svg"
+            xmlns="http://www.w3.org/2000/svg"
+            xmlnsXlink="http://www.w3.org/1999/xlink"
+            version="1.1"
+            baseProfile="full"
+            onDragOver={this.onDragOver}
+            onMouseMove={this.onMouseMove}
+            onMouseDown={this.onMouseDown}
+            onMouseUp={this.onMouseUp}
+          >
+            <BackGround />
+            <ShapeWrap
+              selectedElementID={selectedElementID}
+              objList={objList}
+              transDataPointMap={transDataPointMap}
+              taskStateMap={taskStateMap}
+              staticData={this.staticData}
+              handlers={{
+                onHover: this.onHover,
+                onContextMenu: this.onContextMenu,
+                broadCastTaskState: this.broadCastTaskState,
+                broadCastLineState: this.broadCastLineState
+              }}
+            />
+            <g id="selector-layer">
+              {selectedElementID && curMouseButton === 0 ? (
+                <ShapeHandler staticData={this.staticData} />
+              ) : null}
+            </g>
+          </svg>
+        </div>
+        <RunButton
+          staticData={this.staticData}
+          taskStateMap={taskStateMap}
+          broadCastTaskState={this.broadCastTaskState}
+          broadCastLineState={this.broadCastLineState}
+        />
+        <CreateApp
+          modalVisible={this.state.modalVisible}
+          handleCancel={this.handleCancel}
+          createApp={this.createApp}
+        />
         {/* <TestChild /> */}
       </div>
     );

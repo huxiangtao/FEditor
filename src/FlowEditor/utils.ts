@@ -309,12 +309,3 @@ export function generateCustomProps( o: any ) {
   };
 }
 
-// TODO: huxt 
-// export function generatePathPoints( fromPoint: number[], targetPoint: number[] ) {
-//   const points: number[] = [];
-//   console.log( fromPoint, targetPoint, 'sss===' )
-//   const newPoint = [ fromPoint[ 0 ], targetPoint[ 1 ] ];
-
-//   return `${ fromPoint.join( ',' ) } ${ newPoint.join( ',' ) } ${ targetPoint.join( ',' ) }`
-// }
-
