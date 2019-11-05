@@ -43,10 +43,10 @@ export default class FlowEditor extends React.Component<any, FlowEditorState> {
     curMouseButton: undefined,
     modalVisible: false,
     appList: [
-      { id: "app1", type: "common", name: "app1" },
-      { id: "app3", type: "logic", name: "判断" },
-      { id: "app2", type: "human", name: "人工" },
-      { id: "app2", type: "pause", name: "暂停" }
+      { id: "app1", type: "task", name: "app1" },
+      { id: "app2", type: "logic", name: "判断" },
+      { id: "app3", type: "human", name: "人工" },
+      { id: "app4", type: "pause", name: "暂停" }
     ],
     transDataPointMap: fromJS({}),
     taskStateMap: fromJS({})
@@ -213,7 +213,7 @@ export default class FlowEditor extends React.Component<any, FlowEditorState> {
           const hoveredEleID = (hoveredEle as any).closest(".shape-container")
             .id;
           if (hoveredEleID === selectedElementID) {
-            this.removeShape(this.staticData.drawLine.id);
+            this.removeShape(lineId);
             this.staticData.resetDrawLineId();
           } else {
             const toRect = this.staticData.getToRec(hoveredEle);
@@ -227,22 +227,14 @@ export default class FlowEditor extends React.Component<any, FlowEditorState> {
               .setAttribute("data-shape2", hoveredEleID); // NOTE: set target shape of the line
             this.staticData.addLineMap(
               (hoveredEle as any).closest(".shape-container").id,
-              this.staticData.drawLine.id
+              lineId
             ); // NOTE: add line obj to target shape lines Set
-            this.staticData.createLine(
-              this.staticData.drawLine.id,
-              selectedElementID,
-              hoveredEleID
-            );
-            this.staticData.linkNode(
-              selectedElementID,
-              hoveredEleID,
-              this.staticData.drawLine.id
-            );
+            this.staticData.createLine(lineId, selectedElementID, hoveredEleID);
+            this.staticData.linkNode(selectedElementID, hoveredEleID, lineId);
           }
         } else {
           // NOTE: remove no target shape line
-          this.removeShape(this.staticData.drawLine.id);
+          this.removeShape(lineId);
         }
         break;
       default:
@@ -279,7 +271,7 @@ export default class FlowEditor extends React.Component<any, FlowEditorState> {
     };
     Object.assign(newShape, customProps);
     // set new node int NodeMap
-    this.staticData.createNode(shapeId);
+    this.staticData.createNode(shapeId, type);
     this.setState({
       objList: objList.push(fromJS(newShape))
     });
@@ -322,10 +314,6 @@ export default class FlowEditor extends React.Component<any, FlowEditorState> {
   onContextMenu = (e: any) => {
     // TODO:huxt add context menu
     this.setCurMouseButton(e.button);
-  };
-
-  onPauseClick = (pauseId: string) => {
-    console.log(pauseId, "elliot198===");
   };
 
   onDragOver = (e: any) => {
@@ -424,8 +412,9 @@ export default class FlowEditor extends React.Component<any, FlowEditorState> {
               staticData={this.staticData}
               handlers={{
                 onHover: this.onHover,
-                onPauseClick: this.onPauseClick,
-                onContextMenu: this.onContextMenu
+                onContextMenu: this.onContextMenu,
+                broadCastTaskState: this.broadCastTaskState,
+                broadCastLineState: this.broadCastLineState
               }}
             />
             <g id="selector-layer">
@@ -436,7 +425,7 @@ export default class FlowEditor extends React.Component<any, FlowEditorState> {
           </svg>
         </div>
         <RunButton
-          nodeMap={this.staticData.NodeMap}
+          staticData={this.staticData}
           taskStateMap={taskStateMap}
           broadCastTaskState={this.broadCastTaskState}
           broadCastLineState={this.broadCastLineState}

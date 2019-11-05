@@ -17,7 +17,7 @@ interface PanelProps {
 }
 
 const shapeComponentMap = {
-  common: <rect x="7" y="3" width="66" height="34" {...commonProps} />,
+  task: <rect x="7" y="3" width="66" height="34" {...commonProps} />,
   human: (
     <path d="M 6 2 L 30 18 L 6 34 Z" strokeMiterlimit={10} {...commonProps} />
   ),

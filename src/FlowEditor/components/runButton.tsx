@@ -3,82 +3,24 @@ import { Button, Icon } from "antd";
 import TreeNode from "../TreeNode";
 import { Map } from "immutable";
 import Line from "../Line";
+import PauseNode from "../PauseNode";
+import RunTaskHoc from "./RunTaskHoc";
 
 interface RunButtonProps {
-  nodeMap: Map<string, TreeNode>;
-  taskStateMap: Map<string, string>;
-  broadCastLineState(nodeId: string, state: boolean): void;
-  broadCastTaskState(nodeId: string, state: string): void;
+  nodeMap: Map<string, TreeNode | PauseNode>;
+  recurRunTask(id: string, nodeMap: Map<string, TreeNode | PauseNode>): void;
 }
-export default class RunButton extends React.Component<RunButtonProps, any> {
-  checkPreNodeStatus = (
-    curNodeId: string,
-    nodeMap: Map<string, TreeNode>
-  ): boolean => {
-    const { taskStateMap } = this.props;
-    const curNode = nodeMap.get(curNodeId);
-    const preNodes = (curNode as TreeNode).preNodes;
-    let result = true;
-    if (preNodes) {
-      preNodes.forEach((v: TreeNode) => {
-        console.log(taskStateMap, taskStateMap.get(v.id), v.id);
-        //debugger;
-        if (taskStateMap.get(v.id) !== "done") {
-          result = false;
-        }
-      });
-    }
-    return result;
-  };
-  recurRunTask = (
-    nodeId: string,
-    nodeMap: Map<string, TreeNode>,
-    broadCastNode: (nodeId: string, state: string) => void,
-    broadCastLine: (lineId: string, state: boolean) => void
-  ) => {
-    const node = nodeMap.get(nodeId);
-    if (!node) {
-      return;
-    }
-    node.runTask(nodeId, broadCastNode).then(res => {
-      if (res) {
-        broadCastNode(nodeId, "done");
-        if (node.nextLines.size > 0) {
-          node.nextLines.forEach((line: Line) => {
-            line.playTransData(line.id, broadCastLine).then(res => {
-              if (res) {
-                if (line.to && this.checkPreNodeStatus(line.to.id, nodeMap)) {
-                  this.recurRunTask(
-                    line.to.id,
-                    nodeMap,
-                    broadCastNode,
-                    broadCastLine
-                  );
-                }
-              }
-            });
-          });
-        }
-      } else {
-        broadCastNode(nodeId, "error");
-      }
-    });
-  };
+class RunButton extends React.Component<RunButtonProps, any> {
   runFlow = () => {
-    const { nodeMap, broadCastLineState, broadCastTaskState } = this.props;
-    console.log("start run flow");
-    if (nodeMap.size <= 0) {
+    const { nodeMap, recurRunTask } = this.props;
+    console.log("start run flow", nodeMap);
+    if ((nodeMap as Map<string, TreeNode | PauseNode>).size <= 0) {
       return;
     }
-    nodeMap.forEach(v => {
+    (nodeMap as Map<string, TreeNode | PauseNode>).forEach((v: any) => {
       if (v.preNodes.size <= 0) {
         setTimeout(() => {
-          this.recurRunTask(
-            v.id,
-            nodeMap,
-            broadCastTaskState,
-            broadCastLineState
-          );
+          recurRunTask(v.id, nodeMap as Map<string, TreeNode | PauseNode>);
         }, 0);
       }
     });
@@ -96,3 +38,5 @@ export default class RunButton extends React.Component<RunButtonProps, any> {
     );
   }
 }
+
+export default RunTaskHoc(RunButton);

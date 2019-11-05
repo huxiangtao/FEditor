@@ -5,6 +5,7 @@ import {
 import { fromJS, Map } from "immutable";
 import _ from "lodash";
 import TreeNode from './TreeNode';
+import PauseNode from './PauseNode';
 import Line from './Line';
 import { constants } from "./constants/index";
 interface AttachedItem {
@@ -28,7 +29,7 @@ export default class Store {
 
   Node = {};
 
-  NodeMap: Map<string, TreeNode>
+  NodeMap: Map<string, TreeNode | PauseNode>
 
   LineMap: Map<string, Line>
 
@@ -53,16 +54,29 @@ export default class Store {
     cx: 0,
     cy: 0 // center point of current shape after transform
   }
+
   handlersPos = [
     [],
     [],
     [],
     [],
   ]
+
   bbox = { x: 0, y: 0, w: 0, h: 0 }
 
-  createNode( id: string ) {
-    this.NodeMap = this.NodeMap.set( id, new TreeNode( id, fromJS( {} ), fromJS( {} ), fromJS( {} ), fromJS( {} ) ) );
+  createNode( id: string, type: string ) {
+    let newNode;
+    switch ( type ) {
+      case 'pause':
+        newNode = new PauseNode( id, 'pause', fromJS( {} ), fromJS( {} ), fromJS( {} ), fromJS( {} ) );
+        break;
+      case 'human':
+        newNode = new TreeNode( id, 'human', fromJS( {} ), fromJS( {} ), fromJS( {} ), fromJS( {} ) );
+        break;
+      default:
+        newNode = new TreeNode( id, 'task', fromJS( {} ), fromJS( {} ), fromJS( {} ), fromJS( {} ) );
+    }
+    this.NodeMap = this.NodeMap.set( id, newNode );
   }
 
   createLine( id: string, frId: string, toId: string ) {

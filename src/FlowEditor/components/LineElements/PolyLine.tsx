@@ -1,5 +1,6 @@
 import React from "react";
 import { BaseLine } from "./BaseLine";
+import { Map } from "immutable";
 
 interface PolyLineState {
   style: any;

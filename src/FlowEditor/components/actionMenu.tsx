@@ -3,14 +3,18 @@ import { Menu } from "antd";
 
 interface ActionMenuProps {
   menuList?: string[];
+  type: string;
+  onClick?(type: string): void;
 }
 
 export default function ActionMenu(props: ActionMenuProps) {
-  const { menuList } = props;
+  const { menuList, type, onClick } = props;
   return (
     <Menu
-      onClick={(e: any) => {
-        console.log(e, "rlliotmenu-click");
+      onClick={() => {
+        if (onClick) {
+          (onClick as any)(type);
+        }
       }}
       mode="inline"
     >

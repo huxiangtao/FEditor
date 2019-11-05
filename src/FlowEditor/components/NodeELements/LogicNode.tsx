@@ -3,12 +3,12 @@ import React from "react";
 import ActionMenu from "../actionMenu";
 import { Dropdown } from "antd";
 
-interface DiamondNodeState {
+interface LogicNodeState {
   style: any;
   title: string;
 }
-export default class DiamondNode extends BaseNode {
-  state: DiamondNodeState = {
+export default class LogicNode extends BaseNode {
+  state: LogicNodeState = {
     style: {},
     title: "CircleNode"
   };
@@ -20,7 +20,7 @@ export default class DiamondNode extends BaseNode {
     const customProps = this.customPropsFactory(curElement);
     return (
       <Dropdown
-        overlay={ActionMenu({ menuList: ["delete", "edit"] })}
+        overlay={ActionMenu({ menuList: ["delete", "edit"], type: "logic" })}
         trigger={["contextMenu"]}
       >
         <g

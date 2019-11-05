@@ -1,5 +1,6 @@
 import React from "react";
 import { generateCustomProps, generateCommonStyle } from "../../utils";
+import { Map } from "immutable";
 
 export interface BaseLineProps {
   id: string;

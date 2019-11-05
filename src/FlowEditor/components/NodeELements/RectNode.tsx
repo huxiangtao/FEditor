@@ -1,5 +1,6 @@
 import BaseNode from "./BaseNode";
 import React from "react";
+import { Map } from "immutable";
 import ActionMenu from "../actionMenu";
 import { Dropdown } from "antd";
 
@@ -34,7 +35,7 @@ export default class RectNode extends BaseNode {
       : "#fff";
     return (
       <Dropdown
-        overlay={ActionMenu({ menuList: ["delete", "edit"] })}
+        overlay={ActionMenu({ menuList: ["delete", "edit"], type: "task" })}
         trigger={["contextMenu"]}
       >
         <g

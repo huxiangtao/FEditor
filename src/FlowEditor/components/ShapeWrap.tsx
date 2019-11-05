@@ -2,7 +2,8 @@ import React from "react";
 import RectNode from "./NodeELements/RectNode";
 import PolygonNode from "./NodeELements/PolygonNode";
 import CircleNode from "./NodeELements/CircleNode";
-import DiamondNode from "./NodeELements/DiamondNode";
+import { Map } from "immutable";
+import LogicNode from "./NodeELements/LogicNode";
 import PolyLine from "./LineElements/PolyLine";
 
 interface ShapeWraperProps {
@@ -32,10 +33,12 @@ export default function ShapeWrap(props: ShapeWraperProps) {
               <CircleNode
                 id={o.get("id")}
                 curElement={o}
+                taskStateMap={taskStateMap}
                 staticData={staticData}
-                onClick={handlers.onPauseClick}
                 onContextMenu={handlers.onContextMenu}
                 onHover={handlers.onHover}
+                broadCastLineState={handlers.broadCastLineState}
+                broadCastTaskState={handlers.broadCastTaskState}
               />
             );
             break;
@@ -56,12 +59,17 @@ export default function ShapeWrap(props: ShapeWraperProps) {
                 id={o.get("id")}
                 curElement={o}
                 onHover={handlers.onHover}
+                staticData={staticData}
+                taskStateMap={taskStateMap}
+                onContextMenu={handlers.onContextMenu}
+                broadCastLineState={handlers.broadCastLineState}
+                broadCastTaskState={handlers.broadCastTaskState}
               />
             );
             break;
           case "diamond":
             node = (
-              <DiamondNode
+              <LogicNode
                 id={o.get("id")}
                 curElement={o}
                 taskStateMap={taskStateMap}
