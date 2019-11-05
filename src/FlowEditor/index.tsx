@@ -212,7 +212,11 @@ export default class FlowEditor extends React.Component<any, FlowEditorState> {
         if (hoveredEle) {
           const hoveredEleID = (hoveredEle as any).closest(".shape-container")
             .id;
-          if (hoveredEleID === selectedElementID) {
+          const validateResult = this.staticData.validate(
+            selectedElementID,
+            hoveredEleID
+          );
+          if (!validateResult) {
             this.removeShape(lineId);
             this.staticData.resetDrawLineId();
           } else {
@@ -260,7 +264,12 @@ export default class FlowEditor extends React.Component<any, FlowEditorState> {
     this.staticData.resetActionType();
   };
 
-  createShape = (type: string, id: string, position: number[]) => {
+  createShape = (
+    type: string,
+    id: string,
+    title: string,
+    position: number[]
+  ) => {
     const { objList } = this.state;
     const matrix = [1, 0, 0, 1, position[0], position[1]];
     const newShape = (regularShapes as any)[type];
@@ -271,7 +280,15 @@ export default class FlowEditor extends React.Component<any, FlowEditorState> {
     };
     Object.assign(newShape, customProps);
     // set new node int NodeMap
-    this.staticData.createNode(shapeId, type);
+    if (type === "logic") {
+      this.staticData.createNode(shapeId, type, {
+        title: title,
+        inputsNum: 1,
+        outputsNum: 2
+      });
+    } else {
+      this.staticData.createNode(shapeId, type);
+    }
     this.setState({
       objList: objList.push(fromJS(newShape))
     });

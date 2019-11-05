@@ -67,7 +67,7 @@ export default function ShapeWrap(props: ShapeWraperProps) {
               />
             );
             break;
-          case "diamond":
+          case "logic":
             node = (
               <LogicNode
                 id={o.get("id")}

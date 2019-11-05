@@ -15,10 +15,6 @@ export default {
     type: 'polygon', points: '55,0 105,70 0,70', strokeWidth: 1,
     dataBboxX: 0, dataBboxY: 0, dataBboxW: 105, dataBboxH: 70, dataCX: 55, dataCY: 35,
   },
-  diamond: {
-    type: 'diamond', strokeWidth: 1, d: "M 38 2 L 76 20 L 38 38 L 2 20 Z",
-    dataBboxX: 0, dataBboxY: 0, dataBboxW: 76, dataBboxH: 38, dataCX: 35.5, dataCY: 19,
-  },
   callout: {
     type: 'path', stroke: '#000',
     d: "M22.71 13.05c-24 0-30 20-10.8 24-19.2 8.8 2.4 28 18 20 10.8 16 46.8 16 58.8 0 24 0 24-16 9-24 15-16-9-32-30-24-15-12-39-12-45 4z",
@@ -47,7 +43,7 @@ export default {
     dataBboxX: -10, dataBboxY: -10, dataBboxW: 20, dataBboxH: 20, dataCX: 0, dataCY: 0,
   },
   logic: {
-    type: 'diamond', fill: '#FFF', stroke: "#000", strokeWidth: 1, d: "M 38 2 L 76 20 L 38 38 L 2 20 Z",
+    type: 'logic', fill: '#FFF', stroke: "#000", strokeWidth: 1, d: "M 38 2 L 76 20 L 38 38 L 2 20 Z",
     dataBboxX: 0, dataBboxY: 0, dataBboxW: 76, dataBboxH: 38, dataCX: 35.5, dataCY: 19,
   },
 };

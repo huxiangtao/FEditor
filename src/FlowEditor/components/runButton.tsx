@@ -1,6 +1,6 @@
 import React from "react";
 import { Button, Icon } from "antd";
-import TreeNode from "../TreeNode";
+import { TreeNode } from "../TreeNode";
 import { Map } from "immutable";
 import Line from "../Line";
 import PauseNode from "../PauseNode";
