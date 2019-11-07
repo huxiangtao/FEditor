@@ -41,7 +41,8 @@ export default class RectNode extends BaseNode {
       onHoverOut,
       curElement,
       onContextMenu,
-      taskStateMap
+      taskStateMap,
+      onEditApp
     } = this.props;
     const customProps = this.customPropsFactory(curElement);
     const commonStyle = this.commonStyleFactory(curElement);
@@ -51,7 +52,17 @@ export default class RectNode extends BaseNode {
       : "#fff";
     return (
       <Dropdown
-        overlay={ActionMenu({ menuList: ["delete", "edit"], type: "task" })}
+        overlay={ActionMenu({
+          menuList: ["delete", "edit"],
+          type: "task",
+          onClick: type => {
+            (onEditApp as (formValue: any) => void)({
+              name: curElement.get("title"),
+              apptype: "task",
+              id
+            });
+          }
+        })}
         trigger={["contextMenu"]}
       >
         <g

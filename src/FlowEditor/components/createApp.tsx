@@ -6,22 +6,29 @@ import { randomString } from "../utils";
 const { Option } = Select;
 interface CreateAppProps {
   modalVisible: boolean;
+  initialValues?: any;
   handleCancel: () => void;
   createApp: (app: any) => void;
+  updateApp: (app: any) => void;
 }
 
 export default class CreateApp extends React.Component<CreateAppProps, any> {
   onSubmit = (values: any) => {
-    const { createApp } = this.props;
+    const { createApp, updateApp, initialValues } = this.props;
 
     if (!values.name || !values.apptype) {
       return;
     }
-    createApp({
+    const submitData = {
       id: randomString(12),
       type: values.apptype,
       name: values.name
-    });
+    };
+    if (initialValues.id) {
+      updateApp({ ...submitData, id: initialValues.id });
+    } else {
+      createApp(submitData);
+    }
   };
 
   validate = (values: any) => {
@@ -36,7 +43,7 @@ export default class CreateApp extends React.Component<CreateAppProps, any> {
   };
 
   render() {
-    const { modalVisible, handleCancel } = this.props;
+    const { modalVisible, handleCancel, initialValues } = this.props;
     const formItemLayout = {
       labelCol: { span: 6 },
       wrapperCol: { span: 18 }
@@ -45,6 +52,7 @@ export default class CreateApp extends React.Component<CreateAppProps, any> {
       <FinalForm
         onSubmit={this.onSubmit}
         validate={this.validate}
+        initialValues={initialValues}
         render={({ handleSubmit }) => {
           return (
             <Drawer
@@ -67,7 +75,7 @@ export default class CreateApp extends React.Component<CreateAppProps, any> {
                           validateStatus={touched && error ? "error" : ""}
                           label="应用名称"
                         >
-                          <Input onChange={onChange} checked={value} />
+                          <Input onChange={onChange} value={value} />
                         </Form.Item>
                       );
                     }}
@@ -85,6 +93,7 @@ export default class CreateApp extends React.Component<CreateAppProps, any> {
                           label="应用类型"
                         >
                           <Select
+                            disabled={initialValues.id}
                             value={value}
                             style={{ width: 120 }}
                             onChange={onChange}

@@ -26,6 +26,7 @@ interface BaseNodeProps {
   onContextMenu?: (e: any) => void;
   broadCastLineState?(nodeId: string, state: boolean): void;
   broadCastTaskState?(nodeId: string, state: string): void;
+  onEditApp?(formValue: any): void;
 }
 
 export default class BaseNode extends React.Component<BaseNodeProps, any> {
