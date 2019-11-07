@@ -48,15 +48,7 @@ export default class LogicNode extends BaseNode {
             d={curElement.get("d")}
           />
           <foreignObject width="80" height="45">
-            <p
-              style={{
-                fontSize: "12px",
-                lineHeight: "40px",
-                color: "#000"
-              }}
-            >
-              {curElement.get("title")}
-            </p>
+            <p className="node-text">{curElement.get("title")}</p>
           </foreignObject>
         </g>
       </Dropdown>

@@ -1,5 +1,5 @@
 import React from "react";
-import { Modal, Form, Input, Select } from "antd";
+import { Modal, Drawer, Form, Input, Select, Button } from "antd";
 import { Form as FinalForm, Field } from "react-final-form";
 import { randomString } from "../utils";
 
@@ -47,15 +47,11 @@ export default class CreateApp extends React.Component<CreateAppProps, any> {
         validate={this.validate}
         render={({ handleSubmit }) => {
           return (
-            <Modal
-              title="新增应用" // 镜像清理
+            <Drawer
+              title="新增应用"
+              width={720}
+              onClose={handleCancel}
               visible={modalVisible}
-              destroyOnClose={true}
-              width={500}
-              onOk={() => {
-                handleSubmit();
-              }}
-              onCancel={handleCancel}
             >
               <form onSubmit={handleSubmit}>
                 <Form {...formItemLayout} colon={false}>
@@ -89,7 +85,6 @@ export default class CreateApp extends React.Component<CreateAppProps, any> {
                           label="应用类型"
                         >
                           <Select
-                            defaultValue="task"
                             value={value}
                             style={{ width: 120 }}
                             onChange={onChange}
@@ -103,7 +98,20 @@ export default class CreateApp extends React.Component<CreateAppProps, any> {
                   />
                 </Form>
               </form>
-            </Modal>
+              <div className="form-btn-group">
+                <Button onClick={handleCancel} style={{ marginRight: 8 }}>
+                  取消
+                </Button>
+                <Button
+                  onClick={() => {
+                    handleSubmit();
+                  }}
+                  type="primary"
+                >
+                  确定
+                </Button>
+              </div>
+            </Drawer>
           );
         }}
       />

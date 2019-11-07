@@ -98,15 +98,7 @@ export default class RectNode extends BaseNode {
             width="80"
             height="45"
           >
-            <p
-              style={{
-                fontSize: "12px",
-                lineHeight: "43px",
-                color: "#000"
-              }}
-            >
-              {curElement.get("title")}
-            </p>
+            <p className="node-text">{curElement.get("title")}</p>
           </foreignObject>
           {/* {this.state.showTips && (
             <g>
