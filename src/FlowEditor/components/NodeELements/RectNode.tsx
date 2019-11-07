@@ -11,7 +11,8 @@ interface RectNodeState {
 }
 const fillType = {
   running: "yellow",
-  done: "red"
+  done: "#F69331",
+  error: "red"
 };
 export default class RectNode extends BaseNode {
   state: RectNodeState = {

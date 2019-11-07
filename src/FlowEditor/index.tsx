@@ -45,7 +45,7 @@ export default class FlowEditor extends React.Component<any, FlowEditorState> {
     appList: [
       // { id: "app1", type: "task", name: "app1" },
       // { id: "app3", type: "human", name: "人工" },
-      // { id: "app1", type: "task", name: "app1" },
+      { id: "app0", type: "task", name: "app1" },
       { id: "app1", type: "logic", name: "条件判断" },
       { id: "app2", type: "pause", name: "暂停" }
     ],
