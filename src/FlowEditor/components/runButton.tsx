@@ -2,28 +2,33 @@ import React from "react";
 import { Button, Icon } from "antd";
 import { TreeNode } from "../TreeNode";
 import { Map } from "immutable";
-import Line from "../Line";
 import PauseNode from "../PauseNode";
 import RunTaskHoc from "./RunTaskHoc";
+import LogicNode from "../LogicNode";
 
 interface RunButtonProps {
-  nodeMap: Map<string, TreeNode | PauseNode>;
+  nodeMap: Map<string, TreeNode | PauseNode | LogicNode>;
   recurRunTask(id: string, nodeMap: Map<string, TreeNode | PauseNode>): void;
 }
 class RunButton extends React.Component<RunButtonProps, any> {
   runFlow = () => {
     const { nodeMap, recurRunTask } = this.props;
     console.log("start run flow", nodeMap);
-    if ((nodeMap as Map<string, TreeNode | PauseNode>).size <= 0) {
+    if ((nodeMap as Map<string, TreeNode | PauseNode | LogicNode>).size <= 0) {
       return;
     }
-    (nodeMap as Map<string, TreeNode | PauseNode>).forEach((v: any) => {
-      if (v.preNodes.size <= 0) {
-        setTimeout(() => {
-          recurRunTask(v.id, nodeMap as Map<string, TreeNode | PauseNode>);
-        }, 0);
+    (nodeMap as Map<string, TreeNode | PauseNode | LogicNode>).forEach(
+      (v: any) => {
+        if (v.preNodes.size <= 0) {
+          setTimeout(() => {
+            recurRunTask(v.id, nodeMap as Map<
+              string,
+              TreeNode | PauseNode | LogicNode
+            >);
+          }, 0);
+        }
       }
-    });
+    );
   };
   render() {
     return (

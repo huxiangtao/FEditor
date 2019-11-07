@@ -22,15 +22,21 @@ interface PanelProps {
 }
 
 const shapeComponentMap = {
-  task: <rect x="7" y="3" width="66" height="34" {...commonProps} />,
+  task: <rect x="1" y="1" width="78" height="43" rx="3" {...commonProps} />,
   human: (
-    <path d="M 6 2 L 30 18 L 6 34 Z" strokeMiterlimit={10} {...commonProps} />
+    <polygon
+      points="20,2 60,2 78,14 78,31 60,44 20,44 1,31 1,14"
+      {...commonProps}
+    />
   ),
-  pause: <ellipse cx={38} cy={20} rx={15.6} ry={15.6} {...commonProps} />,
+  pause: (
+    <ellipse cx={39} cy={21} rx={20} ry={20} {...commonProps} fill="#72C14B" />
+  ),
   logic: (
     <path
-      d="M 38 2 L 76 20 L 38 38 L 2 20 Z"
-      strokeMiterlimit={10}
+      d="M 38 1 L 76 20 L 38 41 L 2 20 Z"
+      stroke-linejoin="round"
+      stroke-linecap="square"
       {...commonProps}
     />
   )
@@ -61,27 +67,36 @@ export default class Panel extends React.Component<PanelProps, any> {
     }
   };
 
+  getTextStyle = (type: string): any => {
+    let style = {
+      position: "absolute",
+      top: "14px",
+      textAlign: "center",
+      height: "16px",
+      overflow: "hidden",
+      width: "100%",
+      fontSize: "12px",
+      color: "#000"
+    };
+    if (type === "pause") {
+      style.top = "12px";
+    } else if (type === "logic") {
+      style.top = "11px";
+    }
+    return style;
+  };
+
   render() {
     const { CANVAS_LEFT_MARGIN } = constants;
     const { appList } = this.props;
     const buttonContainerStyle = {
-      display: "flex",
-      justifyContent: "space-evenly",
-      flexWrap: "wrap",
-      marginTop: "18px",
-      left: "0px",
       width: CANVAS_LEFT_MARGIN + "px",
-      height: "260px",
-      backgroundColor: "#F6F6F6"
+      padding: "20px"
     } as React.CSSProperties;
     return (
       <div
         style={{
-          position: "fixed",
-          left: "0px",
-          width: CANVAS_LEFT_MARGIN + "px",
-          height: "100%",
-          backgroundColor: "#F6F6F6"
+          width: CANVAS_LEFT_MARGIN + "px"
         }}
       >
         <p></p>
@@ -105,10 +120,13 @@ export default class Panel extends React.Component<PanelProps, any> {
                 key={app.id}
                 className="panel-button"
               >
-                <svg pointerEvents="none">
+                <svg
+                  pointerEvents="none"
+                  style={{ width: "80px", height: "45px" }}
+                >
                   {(shapeComponentMap as any)[app.type]}
                 </svg>
-                <p style={{ position: "absolute", top: "4px" }}>{app.name}</p>
+                <p style={this.getTextStyle(app.type)}>{app.name}</p>
               </div>
             );
           })}

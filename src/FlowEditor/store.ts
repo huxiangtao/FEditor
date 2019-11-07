@@ -30,7 +30,7 @@ export default class Store {
 
   Node = {};
 
-  NodeMap: Map<string, TreeNode | PauseNode>
+  NodeMap: Map<string, TreeNode | PauseNode | LogicNode>
 
   LineMap: Map<string, Line>
 

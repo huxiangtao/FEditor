@@ -7,6 +7,7 @@ import { Dropdown } from "antd";
 import RunTaskHoc from "../RunTaskHoc";
 import { TreeNode } from "../../TreeNode";
 import PauseNode from "../../PauseNode";
+import LogicNode from "../../LogicNode";
 
 interface CircleNodeState {
   style: any;
@@ -39,11 +40,11 @@ class CircleNode extends BaseNode {
             if (type === "pause") {
               (recurRunTask as (
                 id: string,
-                nodeMap: Map<string, TreeNode | PauseNode>,
+                nodeMap: Map<string, TreeNode | PauseNode | LogicNode>,
                 trigger?: boolean
               ) => void)(
                 id,
-                nodeMap as Map<string, TreeNode | PauseNode>,
+                nodeMap as Map<string, TreeNode | PauseNode | LogicNode>,
                 true
               );
             }
@@ -64,9 +65,20 @@ class CircleNode extends BaseNode {
             {...commonStyle}
             cx={curElement.get("cx")}
             cy={curElement.get("cy")}
+            fill="#72C14B"
             r={curElement.get("r")}
             className="svg-shape shape"
           />
+          <text
+            x={-curElement.get("dataBboxW") / 2.8}
+            y={curElement.get("dataBboxH") / 8}
+            fill="#000"
+            font-size="14"
+            font-family="'Raleway', sans-serif"
+            font-fontWeight="bold"
+          >
+            {curElement.get("title")}
+          </text>
         </g>
       </Dropdown>
     );

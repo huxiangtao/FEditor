@@ -6,6 +6,7 @@ import ActionMenu from "../actionMenu";
 import { TreeNode } from "../../TreeNode";
 import PauseNode from "../../PauseNode";
 import RunTaskHoc from "../RunTaskHoc";
+import LogicNode from "../../LogicNode";
 
 interface PolygonNodeState {
   style: any;
@@ -13,6 +14,10 @@ interface PolygonNodeState {
   modalVisible: boolean;
   radioValue: number;
 }
+const fillType = {
+  running: "yellow",
+  done: "red"
+};
 class PolygonNode extends BaseNode {
   state: PolygonNodeState = {
     style: {},
@@ -25,9 +30,13 @@ class PolygonNode extends BaseNode {
     const { id, nodeMap, recurRunTask } = this.props;
     (recurRunTask as (
       id: string,
-      nodeMap: Map<string, TreeNode | PauseNode>,
+      nodeMap: Map<string, TreeNode | PauseNode | LogicNode>,
       trigger?: boolean
-    ) => void)(id, nodeMap as Map<string, TreeNode | PauseNode>, true);
+    ) => void)(
+      id,
+      nodeMap as Map<string, TreeNode | PauseNode | LogicNode>,
+      true
+    );
     this.setState({
       modalVisible: false
     });
@@ -58,14 +67,22 @@ class PolygonNode extends BaseNode {
       onContextMenu,
       curElement,
       checkPreDone,
+      taskStateMap,
       nodeMap
     } = this.props;
     const menuList = ["delete"];
+    const nodeState = (taskStateMap as Map<string, string>).get(id);
+    const fill = (fillType as any)[nodeState as string]
+      ? (fillType as any)[nodeState as string]
+      : "#fff";
     if (
       (checkPreDone as (
         curNodeId: string,
-        nodeMap: Map<string, TreeNode | PauseNode>
-      ) => boolean)(id, nodeMap as Map<string, TreeNode | PauseNode>)
+        nodeMap: Map<string, TreeNode | PauseNode | LogicNode>
+      ) => boolean)(id, nodeMap as Map<
+        string,
+        TreeNode | PauseNode | LogicNode
+      >)
     ) {
       menuList.push("human");
     }
@@ -96,9 +113,21 @@ class PolygonNode extends BaseNode {
           >
             <polygon
               {...commonStyle}
+              fill={fill}
               className="svg-shape shape"
               points={curElement.get("points")}
             />
+            <foreignObject width="80" height="45">
+              <p
+                style={{
+                  fontSize: "12px",
+                  lineHeight: "43px",
+                  color: "#000"
+                }}
+              >
+                {curElement.get("title")}
+              </p>
+            </foreignObject>
           </g>
         </Dropdown>
         <Modal

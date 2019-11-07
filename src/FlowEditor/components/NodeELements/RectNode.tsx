@@ -1,5 +1,5 @@
 import BaseNode from "./BaseNode";
-import React from "react";
+import React, { Fragment } from "react";
 import { Map } from "immutable";
 import ActionMenu from "../actionMenu";
 import { Dropdown } from "antd";
@@ -7,6 +7,7 @@ import { Dropdown } from "antd";
 interface RectNodeState {
   style: any;
   title: string;
+  showTips: boolean;
 }
 const fillType = {
   running: "yellow",
@@ -15,7 +16,21 @@ const fillType = {
 export default class RectNode extends BaseNode {
   state: RectNodeState = {
     style: {},
-    title: "RectNode"
+    title: "RectNode",
+    showTips: false
+  };
+
+  hoverText = () => {
+    const { curElement } = this.props;
+    this.setState({
+      showTips: true
+    });
+  };
+
+  hoverOutText = () => {
+    this.setState({
+      showTips: false
+    });
   };
 
   render() {
@@ -50,13 +65,54 @@ export default class RectNode extends BaseNode {
         >
           <rect
             {...commonStyle}
-            x={curElement.get("x")}
-            y={curElement.get("y")}
             className="svg-shape shape"
             fill={fill}
+            rx="3"
             width={curElement.get("width")}
             height={curElement.get("height")}
           />
+          {/* {nodeState === "running" && (
+            <rect
+              {...commonStyle}
+              stroke="none"
+              className="svg-shape shape"
+              fill="yellow"
+              rx="3"
+              width={curElement.get("width") - 2}
+              height={curElement.get("height") - 2}
+            >
+              <animate
+                attributeName="fill"
+                attributeType="XML"
+                from="yellow"
+                to="blue"
+                begin="0s"
+                dur="4s"
+                repeatDur="indefinite"
+              />
+            </rect>
+          )} */}
+          <foreignObject
+            onMouseEnter={this.hoverText}
+            onMouseLeave={this.hoverOutText}
+            width="80"
+            height="45"
+          >
+            <p
+              style={{
+                fontSize: "12px",
+                lineHeight: "43px",
+                color: "#000"
+              }}
+            >
+              {curElement.get("title")}
+            </p>
+          </foreignObject>
+          {/* {this.state.showTips && (
+            <g>
+              <text>{curElement.get("title")}</text>
+            </g>
+          )} */}
         </g>
       </Dropdown>
     );

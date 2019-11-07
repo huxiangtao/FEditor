@@ -43,10 +43,11 @@ export default class FlowEditor extends React.Component<any, FlowEditorState> {
     curMouseButton: undefined,
     modalVisible: false,
     appList: [
-      { id: "app1", type: "task", name: "app1" },
-      { id: "app2", type: "logic", name: "判断" },
-      { id: "app3", type: "human", name: "人工" },
-      { id: "app4", type: "pause", name: "暂停" }
+      // { id: "app1", type: "task", name: "app1" },
+      // { id: "app3", type: "human", name: "人工" },
+      // { id: "app1", type: "task", name: "app1" },
+      { id: "app1", type: "logic", name: "条件判断" },
+      { id: "app2", type: "pause", name: "暂停" }
     ],
     transDataPointMap: fromJS({}),
     taskStateMap: fromJS({})
@@ -276,18 +277,19 @@ export default class FlowEditor extends React.Component<any, FlowEditorState> {
     const shapeId = `${id}_${randomString(12)}`;
     const customProps = {
       id: shapeId,
+      title,
       transform: `matrix(${matrix.join(" ")})`
     };
     Object.assign(newShape, customProps);
     // set new node int NodeMap
     if (type === "logic") {
       this.staticData.createNode(shapeId, type, {
-        title: title,
+        title,
         inputsNum: 1,
         outputsNum: 2
       });
     } else {
-      this.staticData.createNode(shapeId, type);
+      this.staticData.createNode(shapeId, type, { title });
     }
     this.setState({
       objList: objList.push(fromJS(newShape))
@@ -354,10 +356,13 @@ export default class FlowEditor extends React.Component<any, FlowEditorState> {
   };
 
   createApp = (app: any) => {
-    const { appList } = this.state;
-    this.setState({
-      appList: [...appList, app]
-    });
+    if (app) {
+      const { appList } = this.state;
+      this.setState({
+        appList: [app, ...appList],
+        modalVisible: false
+      });
+    }
   };
 
   broadCastLineState = (lineId: string, state: boolean) => {
@@ -411,6 +416,7 @@ export default class FlowEditor extends React.Component<any, FlowEditorState> {
         <div id="work-space" tabIndex={0} onKeyUpCapture={this.keyUpHandler}>
           <svg
             id="work-space-svg"
+            focusable="false"
             xmlns="http://www.w3.org/2000/svg"
             xmlnsXlink="http://www.w3.org/1999/xlink"
             version="1.1"

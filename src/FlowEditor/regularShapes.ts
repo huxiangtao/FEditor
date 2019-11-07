@@ -1,46 +1,15 @@
 export default {
-  circle: {
-    type: 'circle', cx: 0, cy: 0, strokeWidth: 1, r: 10,
-    dataBboxX: -10, dataBboxY: -10, dataBboxW: 20, dataBboxH: 20, dataCX: 0, dataCY: 0,
-  },
-  rect: {
-    type: 'rect', fill: 'yellow', width: '70', height: '35', x: 0, y: 0, strokeWidth: 1,
-    dataBboxX: 0, dataBboxY: 0, dataBboxW: 70, dataBboxH: 35, dataCX: 70, dataCY: 35, // cx/cy can be calculated at runtime, but I'm too lazy to do that
-  },
-  cubicBezier: {
-    type: 'cubicBezier', fillOpacity: "0", strokeWidth: 3, d: "M200,400 C200,200 400,400 400,200",
-    dataBboxX: 0, dataBboxY: 0, dataBboxW: 200, dataBboxH: 200, dataCX: 300, dataCY: 300,
-  },
-  triangle: {
-    type: 'polygon', points: '55,0 105,70 0,70', strokeWidth: 1,
-    dataBboxX: 0, dataBboxY: 0, dataBboxW: 105, dataBboxH: 70, dataCX: 55, dataCY: 35,
-  },
-  callout: {
-    type: 'path', stroke: '#000',
-    d: "M22.71 13.05c-24 0-30 20-10.8 24-19.2 8.8 2.4 28 18 20 10.8 16 46.8 16 58.8 0 24 0 24-16 9-24 15-16-9-32-30-24-15-12-39-12-45 4z",
-    dataBboxX: 0, dataBboxY: 0, dataBboxW: 108, dataBboxH: 69, dataCX: 108 / 2, dataCY: 69 / 2,
-  },
-  heart: {
-    type: 'path', strokeWidth: 0,
-    d: `M47.14,5.89C39.85-3.58,25.5,2,25.5,11.62,25.5,2,11.15-3.58,3.86,5.89c-7.54,9.79-.11,26.93,21.64,36.78,21.75-9.85,29.18-27,21.64-36.78Z`,
-    dataBboxX: 0, dataBboxY: 0, dataBboxW: 49, dataBboxH: 42, dataCX: 25, dataCY: 21,
-  },
-  star: {
-    type: 'path', strokeWidth: 1,
-    d: 'M26.285 2.486l5.407 10.956a2.58 2.58 0 0 0 1.944 1.412l12.091 1.757c2.118.308 2.963 2.91 1.431 4.403l-8.749 8.528a2.582 2.582 0 0 0-.742 2.285l2.065 12.042c.362 2.109-1.852 3.717-3.746 2.722l-10.814-5.685a2.585 2.585 0 0 0-2.403 0l-10.814 5.685c-1.894.996-4.108-.613-3.746-2.722l2.065-12.042a2.582 2.582 0 0 0-.742-2.285L.783 21.014c-1.532-1.494-.687-4.096 1.431-4.403l12.091-1.757a2.58 2.58 0 0 0 1.944-1.412l5.407-10.956c.946-1.919 3.682-1.919 4.629 0z',
-    dataBboxX: 0, dataBboxY: 0, dataBboxW: 48, dataBboxH: 47, dataCX: 24, dataCY: 23
-  },
   task: {
-    type: 'rect', fill: '#FFF', width: '70', height: '35', x: 0, y: 0, strokeWidth: 1, stroke: '#000',
-    dataBboxX: 0, dataBboxY: 0, dataBboxW: 70, dataBboxH: 35, dataCX: 70, dataCY: 35, // cx/cy can be calculated at runtime, but I'm too lazy to do that
+    type: 'rect', fill: '#FFF', width: '80', height: '45', x: 0, y: 0, strokeWidth: 1, stroke: '#000',
+    dataBboxX: 0, dataBboxY: 0, dataBboxW: 80, dataBboxH: 45, dataCX: 80, dataCY: 45,
   },
   human: {
-    type: 'polygon', fill: '#FFF', stroke: "#000", points: '55,0 105,70 0,70', strokeWidth: 1,
-    dataBboxX: 0, dataBboxY: 0, dataBboxW: 105, dataBboxH: 70, dataCX: 55, dataCY: 35,
+    type: 'polygon', fill: '#FFF', stroke: "#000", points: '20,2 60,2 78,14 78,31 60,44 20,44 1,31 1,14', strokeWidth: 1,
+    dataBboxX: 0, dataBboxY: 0, dataBboxW: 80, dataBboxH: 45, dataCX: 80, dataCY: 45,
   },
   pause: {
-    type: 'circle', fill: '#FFF', stroke: "#000", cx: 0, cy: 0, strokeWidth: 1, r: 10,
-    dataBboxX: -10, dataBboxY: -10, dataBboxW: 20, dataBboxH: 20, dataCX: 0, dataCY: 0,
+    type: 'circle', fill: '#FFF', stroke: "#000", cx: 0, cy: 0, strokeWidth: 1, r: 20,
+    dataBboxX: -20, dataBboxY: -20, dataBboxW: 40, dataBboxH: 40, dataCX: 0, dataCY: 0,
   },
   logic: {
     type: 'logic', fill: '#FFF', stroke: "#000", strokeWidth: 1, d: "M 38 2 L 76 20 L 38 38 L 2 20 Z",
