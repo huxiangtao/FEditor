@@ -34,7 +34,7 @@ class CircleNode extends BaseNode {
     return (
       <Dropdown
         overlay={ActionMenu({
-          menuList: ["delete", "start"],
+          menuList: ["删除", "开始"],
           type: "pause",
           onClick: type => {
             if (type === "pause") {

@@ -53,7 +53,7 @@ export default class RectNode extends BaseNode {
     return (
       <Dropdown
         overlay={ActionMenu({
-          menuList: ["delete", "edit"],
+          menuList: ["删除", "编辑"],
           type: "task",
           onClick: type => {
             (onEditApp as (formValue: any) => void)({
