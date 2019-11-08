@@ -11,7 +11,8 @@ interface RectNodeState {
 }
 const fillType = {
   running: "yellow",
-  done: "red"
+  done: "#F69331",
+  error: "red"
 };
 export default class RectNode extends BaseNode {
   state: RectNodeState = {
@@ -40,7 +41,8 @@ export default class RectNode extends BaseNode {
       onHoverOut,
       curElement,
       onContextMenu,
-      taskStateMap
+      taskStateMap,
+      onEditApp
     } = this.props;
     const customProps = this.customPropsFactory(curElement);
     const commonStyle = this.commonStyleFactory(curElement);
@@ -50,7 +52,17 @@ export default class RectNode extends BaseNode {
       : "#fff";
     return (
       <Dropdown
-        overlay={ActionMenu({ menuList: ["delete", "edit"], type: "task" })}
+        overlay={ActionMenu({
+          menuList: ["删除", "编辑"],
+          type: "task",
+          onClick: type => {
+            (onEditApp as (formValue: any) => void)({
+              name: curElement.get("title"),
+              apptype: "task",
+              id
+            });
+          }
+        })}
         trigger={["contextMenu"]}
       >
         <g
@@ -98,15 +110,7 @@ export default class RectNode extends BaseNode {
             width="80"
             height="45"
           >
-            <p
-              style={{
-                fontSize: "12px",
-                lineHeight: "43px",
-                color: "#000"
-              }}
-            >
-              {curElement.get("title")}
-            </p>
+            <p className="node-text">{curElement.get("title")}</p>
           </foreignObject>
           {/* {this.state.showTips && (
             <g>

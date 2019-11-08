@@ -25,6 +25,7 @@ interface FlowEditorState {
   objList: List<any> | undefined;
   curMouseButton: number | undefined;
   modalVisible: boolean;
+  initAppValues: any;
   appList: any[];
   transDataPointMap: Map<string, boolean>;
   taskStateMap: Map<string, string>;
@@ -42,10 +43,11 @@ export default class FlowEditor extends React.Component<any, FlowEditorState> {
     objList: fromJS([]),
     curMouseButton: undefined,
     modalVisible: false,
+    initAppValues: undefined,
     appList: [
       // { id: "app1", type: "task", name: "app1" },
       // { id: "app3", type: "human", name: "人工" },
-      // { id: "app1", type: "task", name: "app1" },
+      // { id: "app0", type: "task", name: "app1" },
       { id: "app1", type: "logic", name: "条件判断" },
       { id: "app2", type: "pause", name: "暂停" }
     ],
@@ -265,37 +267,6 @@ export default class FlowEditor extends React.Component<any, FlowEditorState> {
     this.staticData.resetActionType();
   };
 
-  createShape = (
-    type: string,
-    id: string,
-    title: string,
-    position: number[]
-  ) => {
-    const { objList } = this.state;
-    const matrix = [1, 0, 0, 1, position[0], position[1]];
-    const newShape = (regularShapes as any)[type];
-    const shapeId = `${id}_${randomString(12)}`;
-    const customProps = {
-      id: shapeId,
-      title,
-      transform: `matrix(${matrix.join(" ")})`
-    };
-    Object.assign(newShape, customProps);
-    // set new node int NodeMap
-    if (type === "logic") {
-      this.staticData.createNode(shapeId, type, {
-        title,
-        inputsNum: 1,
-        outputsNum: 2
-      });
-    } else {
-      this.staticData.createNode(shapeId, type, { title });
-    }
-    this.setState({
-      objList: objList.push(fromJS(newShape))
-    });
-  };
-
   onHover = (e: any) => {
     if (this.staticData.action !== "draw-line") return;
     const classList = e.target.classList;
@@ -349,10 +320,12 @@ export default class FlowEditor extends React.Component<any, FlowEditorState> {
     });
   };
 
-  showAppForm = () => {
-    this.setState({
-      modalVisible: true
-    });
+  showAppForm = (values?: any) => {
+    const temp = { modalVisible: true };
+    if (values) {
+      (temp as any)["initAppValues"] = values;
+    }
+    this.setState(temp);
   };
 
   createApp = (app: any) => {
@@ -363,6 +336,73 @@ export default class FlowEditor extends React.Component<any, FlowEditorState> {
         modalVisible: false
       });
     }
+  };
+
+  updateApp = (app: any) => {
+    if (app) {
+      const { appList } = this.state;
+      const id = _.get(app, "id");
+
+      appList.forEach(v => {
+        if (id.indexOf(v.id) > -1) {
+          v.name = app.name;
+        }
+      });
+      this.setState({
+        appList,
+        modalVisible: false
+      });
+      this.updateShape(id, app.name);
+    }
+  };
+
+  updateShape = (id: string, title: string) => {
+    const { objList } = this.state;
+    let nextObjList: List<any> | undefined = undefined;
+    objList.forEach((v: any, i: number) => {
+      const list: List<any> = nextObjList ? nextObjList : objList;
+      if (id.split("_")[0] === v.get("id").split("_")[0]) {
+        nextObjList = list.update(i, (val: any) => {
+          return val.set("title", title);
+        });
+      }
+    });
+    if (nextObjList) {
+      this.setState({
+        objList: nextObjList
+      });
+    }
+  };
+
+  createShape = (
+    type: string,
+    id: string,
+    title: string,
+    position: number[]
+  ) => {
+    const { objList } = this.state;
+    const matrix = [1, 0, 0, 1, position[0], position[1]];
+    const newShape = (regularShapes as any)[type];
+    const shapeId = `${id}_${randomString(12)}`;
+    const customProps = {
+      id: shapeId,
+      title,
+      transform: `matrix(${matrix.join(" ")})`
+    };
+    Object.assign(newShape, customProps);
+    // set new node int NodeMap
+    if (type === "logic") {
+      this.staticData.createNode(shapeId, type, {
+        title,
+        inputsNum: 1,
+        outputsNum: 2
+      });
+    } else {
+      this.staticData.createNode(shapeId, type, { title });
+    }
+    this.setState({
+      objList: objList.push(fromJS(newShape))
+    });
   };
 
   broadCastLineState = (lineId: string, state: boolean) => {
@@ -437,7 +477,8 @@ export default class FlowEditor extends React.Component<any, FlowEditorState> {
                 onHover: this.onHover,
                 onContextMenu: this.onContextMenu,
                 broadCastTaskState: this.broadCastTaskState,
-                broadCastLineState: this.broadCastLineState
+                broadCastLineState: this.broadCastLineState,
+                onEditApp: this.showAppForm
               }}
             />
             <g id="selector-layer">
@@ -457,6 +498,8 @@ export default class FlowEditor extends React.Component<any, FlowEditorState> {
           modalVisible={this.state.modalVisible}
           handleCancel={this.handleCancel}
           createApp={this.createApp}
+          updateApp={this.updateApp}
+          initialValues={this.state.initAppValues}
         />
         {/* <TestChild /> */}
       </div>

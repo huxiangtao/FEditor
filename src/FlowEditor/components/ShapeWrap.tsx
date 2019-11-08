@@ -50,6 +50,7 @@ export default function ShapeWrap(props: ShapeWraperProps) {
                 taskStateMap={taskStateMap}
                 onHover={handlers.onHover}
                 onContextMenu={handlers.onContextMenu}
+                onEditApp={handlers.onEditApp}
               />
             );
             break;

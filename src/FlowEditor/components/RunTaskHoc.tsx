@@ -41,44 +41,53 @@ export default function RunTaskHoc(
       if (!node) {
         return;
       }
-
       const execTask = () => {
-        node.runTask(nodeId, broadCastTaskState).then(res => {
-          if (res) {
-            broadCastTaskState(nodeId, "done");
-            if (node.nextLines.size > 0) {
-              if (node.type === "logic") {
-                const rightLine = (node as LogicNode).getRightLineId(
-                  node.nextLines
-                );
-                rightLine
-                  .playTransData(rightLine.id, broadCastLineState)
-                  .then(res => {
-                    if (res) {
-                      if (
-                        rightLine.to &&
-                        this.checkPreDone(rightLine.to.id, nodeMap)
-                      ) {
-                        this.recurRunTask(rightLine.to.id, nodeMap, trigger);
+        node.runTask(nodeId, broadCastTaskState).then(
+          res => {
+            if (res && res.success) {
+              broadCastTaskState(nodeId, "done");
+              if (node.nextLines.size > 0) {
+                if (node.type === "logic") {
+                  const rightLine = (node as LogicNode).getRightLineId(
+                    node.nextLines
+                  );
+                  rightLine
+                    .playTransData(rightLine.id, broadCastLineState)
+                    .then(res => {
+                      if (res) {
+                        if (
+                          rightLine.to &&
+                          this.checkPreDone(rightLine.to.id, nodeMap)
+                        ) {
+                          this.recurRunTask(rightLine.to.id, nodeMap, trigger);
+                        }
                       }
-                    }
+                    });
+                } else {
+                  node.nextLines.forEach((line: Line) => {
+                    line
+                      .playTransData(line.id, broadCastLineState)
+                      .then(res => {
+                        if (res) {
+                          if (
+                            line.to &&
+                            this.checkPreDone(line.to.id, nodeMap)
+                          ) {
+                            this.recurRunTask(line.to.id, nodeMap, trigger);
+                          }
+                        }
+                      });
                   });
-              } else {
-                node.nextLines.forEach((line: Line) => {
-                  line.playTransData(line.id, broadCastLineState).then(res => {
-                    if (res) {
-                      if (line.to && this.checkPreDone(line.to.id, nodeMap)) {
-                        this.recurRunTask(line.to.id, nodeMap, trigger);
-                      }
-                    }
-                  });
-                });
+                }
               }
+            } else {
+              broadCastTaskState(nodeId, "error");
             }
-          } else {
+          },
+          err => {
             broadCastTaskState(nodeId, "error");
           }
-        });
+        );
       };
       if (node.type === "task" || node.type === "logic" || trigger) {
         execTask();
