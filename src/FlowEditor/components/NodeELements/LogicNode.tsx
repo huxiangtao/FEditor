@@ -36,7 +36,7 @@ export default class LogicNode extends BaseNode {
 
   render() {
     const { style, title, modalVisible } = this.state;
-    const { id, onHover, curElement, onContextMenu, taskStateMap } = this.props;
+    const { id, onHover, curElement, onContextMenu, taskStateMap, removeShape } = this.props;
     const commonStyle = this.commonStyleFactory(curElement);
     const customProps = this.customPropsFactory(curElement);
     const nodeState = (taskStateMap as Map<string, string>).get(id);
@@ -47,12 +47,16 @@ export default class LogicNode extends BaseNode {
       <Fragment>
         <Dropdown
           overlay={ActionMenu({
-            menuList: ["删除", "编辑条件"],
+            menuList: ["删除","编辑条件"],
             type: "logic",
-            onClick: type => {
-              this.setState({
-                modalVisible: true
-              });
+            onClick: (type: any, param: any) => {
+              if (param.key === '0') {
+                (removeShape as any)(id);
+              } else {
+                this.setState({
+                  modalVisible: true
+                });
+              }
             }
           })}
           trigger={["contextMenu"]}

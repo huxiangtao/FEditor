@@ -42,7 +42,8 @@ export default class RectNode extends BaseNode {
       curElement,
       onContextMenu,
       taskStateMap,
-      onEditApp
+      onEditApp,
+      removeShape
     } = this.props;
     const customProps = this.customPropsFactory(curElement);
     const commonStyle = this.commonStyleFactory(curElement);
@@ -53,14 +54,18 @@ export default class RectNode extends BaseNode {
     return (
       <Dropdown
         overlay={ActionMenu({
-          menuList: ["删除", "编辑"],
+          menuList: ["删除","编辑"],
           type: "task",
-          onClick: type => {
-            (onEditApp as (formValue: any) => void)({
-              name: curElement.get("title"),
-              apptype: "task",
-              id
-            });
+          onClick: (type: any, param: any) => {
+            if (param.key === '0') {
+              (removeShape as any)(id);
+            } else {
+              (onEditApp as (formValue: any) => void)({
+                name: curElement.get("title"),
+                apptype: "task",
+                id
+              });
+            }
           }
         })}
         trigger={["contextMenu"]}

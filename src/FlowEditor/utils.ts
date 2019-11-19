@@ -39,39 +39,42 @@ export function pointTransform( m: number[], p: number[] ) {
   return [ m[ 0 ] * p[ 0 ] + m[ 2 ] * p[ 1 ] + m[ 4 ], m[ 1 ] * p[ 0 ] + m[ 3 ] * p[ 1 ] + m[ 5 ] ];
 }
 
-export function lineConnHandlers( bbox: any ) {
-  const { CANVAS_LEFT_MARGIN, ARROW_WIDTH, ARROW_HEIGHT } = constants;
+export function lineConnHandlers( bbox: any, marginConfig: any, gap: number = 35 ) {
+  const { ARROW_WIDTH, ARROW_HEIGHT } = constants;
+  const CANVAS_LEFT_MARGIN = _.get(marginConfig, 'CANVAS_LEFT_MARGIN', constants.CANVAS_LEFT_MARGIN);
+  const CANVAS_TOP_MARGIN = _.get(marginConfig, 'CANVAS_TOP_MARGIN', constants.CANVAS_TOP_MARGIN);
   return [
     `M ${ bbox.left -
     CANVAS_LEFT_MARGIN +
     bbox.width / 2 -
-    ARROW_WIDTH / 2 }, ${ bbox.top - 35 } h ${ ARROW_WIDTH } L ${ bbox.left -
+    ARROW_WIDTH / 2 }, ${ bbox.top - gap - CANVAS_TOP_MARGIN } h ${ ARROW_WIDTH } L ${ bbox.left -
     CANVAS_LEFT_MARGIN +
-    bbox.width / 2 }, ${ bbox.top - 35 - ARROW_HEIGHT } z`,
-    `M ${ bbox.right - CANVAS_LEFT_MARGIN + 35 }, ${ bbox.top +
+    bbox.width / 2 }, ${ bbox.top - gap - ARROW_HEIGHT - CANVAS_TOP_MARGIN } z`,
+    `M ${ bbox.right - CANVAS_LEFT_MARGIN + gap }, ${ bbox.top - CANVAS_TOP_MARGIN +
     bbox.height / 2 -
     ARROW_WIDTH / 2 } v ${ ARROW_WIDTH } L ${ bbox.right -
     CANVAS_LEFT_MARGIN +
-    35 +
-    ARROW_HEIGHT }, ${ bbox.top + bbox.height / 2 } z`,
+    gap +
+    ARROW_HEIGHT }, ${ ( bbox.top - CANVAS_TOP_MARGIN ) + bbox.height / 2 } z`,
     `M ${ bbox.left -
     CANVAS_LEFT_MARGIN +
     bbox.width / 2 -
-    ARROW_WIDTH / 2 }, ${ bbox.bottom + 35 } h ${ ARROW_WIDTH } L ${ bbox.left -
+    ARROW_WIDTH / 2 }, ${ bbox.bottom - CANVAS_TOP_MARGIN + gap } h ${ ARROW_WIDTH } L ${ bbox.left -
     CANVAS_LEFT_MARGIN +
-    bbox.width / 2 }, ${ bbox.bottom + 35 + ARROW_HEIGHT } z`,
-    `M ${ bbox.left - CANVAS_LEFT_MARGIN - 35 }, ${ bbox.top +
+    bbox.width / 2 }, ${ bbox.bottom - CANVAS_TOP_MARGIN + gap + ARROW_HEIGHT } z`,
+    `M ${ bbox.left - CANVAS_LEFT_MARGIN - gap }, ${ bbox.top - CANVAS_TOP_MARGIN +
     bbox.height / 2 -
     ARROW_WIDTH / 2 } v ${ ARROW_WIDTH } L ${ bbox.left -
     CANVAS_LEFT_MARGIN -
-    35 -
-    ARROW_HEIGHT }, ${ bbox.top + bbox.height / 2 } z`
+    gap -
+    ARROW_HEIGHT }, ${ bbox.top - CANVAS_TOP_MARGIN + bbox.height / 2 } z`
   ];
 }
 
-export function updateHandlersPos( staticData: any ) {
+export function updateHandlersPos( staticData: any, marginConfig: any ) {
   const lineConnector = lineConnHandlers(
-    staticData.selected.getBoundingClientRect()
+    staticData.selected.getBoundingClientRect(),
+    marginConfig
   );
   Array.from( staticData.selector.getElementsByClassName( "handler" ) ).forEach(
     ( h: any, idx ) => {
@@ -234,8 +237,10 @@ export function optimisePath( rectA: any, rectB: any, leadingMargin: any = SHAPE
   return breadcrumb.join( ' ' )
 };
 
-export function updatePaths( selectedElement: any, connectedLine: any ) {
-  const { CANVAS_LEFT_MARGIN, CANVAS_TOP_MARGIN, SHAPE_LEADING_MARGIN } = constants;
+export function updatePaths( selectedElement: any, connectedLine: any, marginConfig: any ) {
+  const { SHAPE_LEADING_MARGIN } = constants;
+  const CANVAS_LEFT_MARGIN = _.get(marginConfig, 'CANVAS_LEFT_MARGIN', constants.CANVAS_LEFT_MARGIN)
+  const CANVAS_TOP_MARGIN = _.get(marginConfig, 'CANVAS_TOP_MARGIN', constants.CANVAS_TOP_MARGIN)
   let results: any = {};
   if ( !connectedLine || connectedLine.size === 0 ) return results;
 
@@ -273,7 +278,7 @@ export function updatePaths( selectedElement: any, connectedLine: any ) {
         ( rects as any )[ r ].points = [
           [ bbox.left - CANVAS_LEFT_MARGIN + Math.round( bbox.width / 2 ), bbox.top - CANVAS_TOP_MARGIN ],
           [ bbox.right - CANVAS_LEFT_MARGIN, bbox.top - CANVAS_TOP_MARGIN + Math.round( bbox.height / 2 ) ],
-          [ bbox.left - CANVAS_LEFT_MARGIN + Math.round( bbox.width / 2 ), bbox.bottom ],
+          [ bbox.left - CANVAS_LEFT_MARGIN + Math.round( bbox.width / 2 ), bbox.bottom - CANVAS_TOP_MARGIN ],
           [ bbox.left - CANVAS_LEFT_MARGIN, bbox.top - CANVAS_TOP_MARGIN + Math.round( bbox.height / 2 ) ]
         ]
       }

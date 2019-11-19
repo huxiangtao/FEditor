@@ -68,9 +68,10 @@ class PolygonNode extends BaseNode {
       curElement,
       checkPreDone,
       taskStateMap,
-      nodeMap
+      nodeMap,
+      removeShape
     } = this.props;
-    const menuList = ["delete"];
+    const menuList = ["删除"];
     const nodeState = (taskStateMap as Map<string, string>).get(id);
     const fill = (fillType as any)[nodeState as string]
       ? (fillType as any)[nodeState as string]
@@ -84,7 +85,7 @@ class PolygonNode extends BaseNode {
         TreeNode | PauseNode | LogicNode
       >)
     ) {
-      menuList.push("human");
+      menuList.push("人工操作");
     }
     const commonStyle = this.commonStyleFactory(curElement);
     const customProps = this.customPropsFactory(curElement);
@@ -94,9 +95,13 @@ class PolygonNode extends BaseNode {
           overlay={ActionMenu({
             menuList,
             type: "human",
-            onClick: type => {
-              if (type === "human") {
-                this.openModal();
+            onClick: (type: any, param: any) => {
+              if (param.key === '0') {
+                (removeShape as any)(id);
+              } else {
+                if (type === "human") {
+                  this.openModal();
+                }
               }
             }
           })}
@@ -118,13 +123,7 @@ class PolygonNode extends BaseNode {
               points={curElement.get("points")}
             />
             <foreignObject width="80" height="45">
-              <p
-                style={{
-                  fontSize: "12px",
-                  lineHeight: "43px",
-                  color: "#000"
-                }}
-              >
+              <p className="node-text">
                 {curElement.get("title")}
               </p>
             </foreignObject>

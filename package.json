@@ -1,9 +1,19 @@
 {
-  "name": "feditor",
-  "version": "0.1.0",
+  "name": "@caicloud/fedit",
+  "version": "0.0.2",
   "main": "dist/FlowEditor/index.js",
-  "private": true,
   "dependencies": {
+    "immutable": "^4.0.0-rc.12"
+  },
+  "peerDependencies": {
+    "antd": "^3.24.3",
+    "final-form": "4.12.0",
+    "lodash": "^4.17.15",
+    "react": "^16.11.0",
+    "react-dom": "^16.11.0",
+    "react-final-form": "4.1.0"
+  },
+  "devDependencies": {
     "@babel/cli": "^7.7.0",
     "@babel/core": "^7.7.2",
     "@babel/plugin-proposal-class-properties": "^7.7.0",
@@ -16,14 +26,7 @@
     "@types/node": "^12.11.6",
     "@types/react": "^16.9.11",
     "@types/react-dom": "^16.9.2",
-    "antd": "^3.24.3",
     "eslint": "^6.5.1",
-    "final-form": "4.12.0",
-    "immutable": "^4.0.0-rc.12",
-    "lodash": "^4.17.15",
-    "react": "^16.11.0",
-    "react-dom": "^16.11.0",
-    "react-final-form": "4.1.0",
     "react-scripts": "3.2.0",
     "typescript": "^3.6.4"
   },

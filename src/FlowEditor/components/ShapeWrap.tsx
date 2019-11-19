@@ -39,6 +39,7 @@ export default function ShapeWrap(props: ShapeWraperProps) {
                 onHover={handlers.onHover}
                 broadCastLineState={handlers.broadCastLineState}
                 broadCastTaskState={handlers.broadCastTaskState}
+                removeShape={handlers.removeShape}
               />
             );
             break;
@@ -51,6 +52,7 @@ export default function ShapeWrap(props: ShapeWraperProps) {
                 onHover={handlers.onHover}
                 onContextMenu={handlers.onContextMenu}
                 onEditApp={handlers.onEditApp}
+                removeShape={handlers.removeShape}
               />
             );
             break;
@@ -65,6 +67,7 @@ export default function ShapeWrap(props: ShapeWraperProps) {
                 onContextMenu={handlers.onContextMenu}
                 broadCastLineState={handlers.broadCastLineState}
                 broadCastTaskState={handlers.broadCastTaskState}
+                removeShape={handlers.removeShape}
               />
             );
             break;
@@ -76,6 +79,7 @@ export default function ShapeWrap(props: ShapeWraperProps) {
                 taskStateMap={taskStateMap}
                 onHover={handlers.onHover}
                 onContextMenu={handlers.onContextMenu}
+                removeShape={handlers.removeShape}
               />
             );
             break;

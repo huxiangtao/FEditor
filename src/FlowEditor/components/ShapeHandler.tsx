@@ -3,6 +3,7 @@ import { lineConnHandlers } from "../utils";
 
 interface ShapeHandlerProps {
   staticData: any;
+  marginConfig: any;
 }
 
 export default function ShapeHandler(props: ShapeHandlerProps) {
@@ -11,7 +12,7 @@ export default function ShapeHandler(props: ShapeHandlerProps) {
   if (!ele) return null;
 
   let placeHolderPoints = staticData.handlersPos.slice(0, 4);
-  let lineConn = lineConnHandlers(ele.getBoundingClientRect());
+  let lineConn = lineConnHandlers(ele.getBoundingClientRect(), props.marginConfig);
   return (
     <g id="handlers">
       {lineConn.map((l, idx) => (

@@ -17,12 +17,26 @@ interface AttachedItem {
 interface Attached {
   [ id: string ]: AttachedItem
 }
+
+interface MarginConfig {
+  CANVAS_LEFT_MARGIN?: number,
+  CANVAS_RIGHT_MARGIN?: number,
+  CANVAS_TOP_MARGIN?: number,
+  CANVAS_BOTTOM_MARGIN?: number,
+}
 export default class Store {
-  constructor () {
+  constructor (marginConfig: any) {
+    this.marginConfig = _.assign(_.pick(constants, [
+      'CANVAS_LEFT_MARGIN', 
+      'CANVAS_RIGHT_MARGIN', 
+      'CANVAS_TOP_MARGIN', 
+      'CANVAS_BOTTOM_MARGIN']), marginConfig);
     this.attached = {};
     this.NodeMap = fromJS( {} )
     this.LineMap = fromJS( {} )
   }
+
+  marginConfig: MarginConfig
 
   selected: any
 
@@ -144,7 +158,8 @@ export default class Store {
   }
 
   updateStartCoordinate( x: number, y: number ) {
-    const { CANVAS_LEFT_MARGIN, CANVAS_TOP_MARGIN } = constants;
+    const CANVAS_LEFT_MARGIN = _.get(this.marginConfig, 'CANVAS_LEFT_MARGIN', constants.CANVAS_LEFT_MARGIN); 
+    const CANVAS_TOP_MARGIN = _.get(this.marginConfig, 'CANVAS_TOP_MARGIN', constants.CANVAS_TOP_MARGIN);
     this.transform.startX = x - CANVAS_LEFT_MARGIN;
     this.transform.startY = y - CANVAS_TOP_MARGIN;
   }
@@ -177,14 +192,15 @@ export default class Store {
   }
 
   getConnectStartPointPos( handlerID: number ): number[] {
-    const { CANVAS_LEFT_MARGIN } = constants;
+    const CANVAS_LEFT_MARGIN = _.get(this.marginConfig, 'CANVAS_LEFT_MARGIN', constants.CANVAS_LEFT_MARGIN); 
+    const CANVAS_TOP_MARGIN = _.get(this.marginConfig, 'CANVAS_TOP_MARGIN', constants.CANVAS_TOP_MARGIN); 
     if ( this.selected ) {
       const bbox = this.getShapeBoundingClientRect();
       const candidatePoints = [
-        [ bbox.left - CANVAS_LEFT_MARGIN + bbox.width / 2, bbox.top ], // top
-        [ bbox.right - CANVAS_LEFT_MARGIN, bbox.top + bbox.height / 2 ], // right
-        [ bbox.left - CANVAS_LEFT_MARGIN + bbox.width / 2, bbox.bottom ], // bottom
-        [ bbox.left - CANVAS_LEFT_MARGIN, bbox.top + bbox.height / 2 ] // left
+        [ bbox.left - CANVAS_LEFT_MARGIN + bbox.width / 2, bbox.top - CANVAS_TOP_MARGIN], // top
+        [ bbox.right - CANVAS_LEFT_MARGIN, bbox.top - CANVAS_TOP_MARGIN + bbox.height / 2 ], // right
+        [ bbox.left - CANVAS_LEFT_MARGIN + bbox.width / 2, bbox.bottom - CANVAS_TOP_MARGIN], // bottom
+        [ bbox.left - CANVAS_LEFT_MARGIN, bbox.top - CANVAS_TOP_MARGIN + bbox.height / 2 ] // left
       ];
       ( this.drawLine.points as any ) = [ candidatePoints[ handlerID ], // start point pos
       candidatePoints[ handlerID ] ]
@@ -203,10 +219,9 @@ export default class Store {
   }
 
   getFromRec(): number[][] {
-    const {
-      CANVAS_LEFT_MARGIN,
-      CANVAS_TOP_MARGIN,
-    } = constants;
+    const CANVAS_LEFT_MARGIN = _.get(this.marginConfig, 'CANVAS_LEFT_MARGIN', constants.CANVAS_LEFT_MARGIN); 
+    const CANVAS_TOP_MARGIN = _.get(this.marginConfig, 'CANVAS_TOP_MARGIN', constants.CANVAS_TOP_MARGIN); 
+    
     const bbox = this.getShapeBoundingClientRect();
     return [
       // the 4 points go from [top, right, bottom, left]
@@ -220,7 +235,7 @@ export default class Store {
       ],
       [
         bbox.left - CANVAS_LEFT_MARGIN + Math.round( bbox.width / 2 ),
-        bbox.bottom
+        bbox.bottom - CANVAS_TOP_MARGIN
       ],
       [
         bbox.left - CANVAS_LEFT_MARGIN,
@@ -230,10 +245,8 @@ export default class Store {
   }
 
   getToRec( hoveredEle: any ): number[][] {
-    const {
-      CANVAS_LEFT_MARGIN,
-      CANVAS_TOP_MARGIN,
-    } = constants;
+    const CANVAS_LEFT_MARGIN = _.get(this.marginConfig, 'CANVAS_LEFT_MARGIN', constants.CANVAS_LEFT_MARGIN); 
+    const CANVAS_TOP_MARGIN = _.get(this.marginConfig, 'CANVAS_TOP_MARGIN', constants.CANVAS_TOP_MARGIN); 
     const bbox2 = ( hoveredEle as any ).getBoundingClientRect();
     return [
       [
@@ -246,7 +259,7 @@ export default class Store {
       ],
       [
         bbox2.left - CANVAS_LEFT_MARGIN + Math.round( bbox2.width / 2 ),
-        bbox2.bottom
+        bbox2.bottom - CANVAS_TOP_MARGIN
       ],
       [
         bbox2.left - CANVAS_LEFT_MARGIN,
@@ -260,8 +273,9 @@ export default class Store {
   }
 
   updateDrawLineTargetPointsPos( x: number, y: number ) {
-    const { CANVAS_LEFT_MARGIN, CANVAS_TOP_MARGIN } = constants;
-    ( this.drawLine.points[ 1 ] as number[] ) = [ x - CANVAS_LEFT_MARGIN, y - CANVAS_TOP_MARGIN ]
+    const CANVAS_LEFT_MARGIN = _.get(this.marginConfig, 'CANVAS_LEFT_MARGIN', constants.CANVAS_LEFT_MARGIN); 
+    const CANVAS_TOP_MARGIN = _.get(this.marginConfig, 'CANVAS_TOP_MARGIN', constants.CANVAS_TOP_MARGIN); 
+     ( this.drawLine.points[ 1 ] as number[] ) = [ x - CANVAS_LEFT_MARGIN, y - CANVAS_TOP_MARGIN ]
   }
 
   updateHoverElement( ele: any ) {
@@ -281,7 +295,8 @@ export default class Store {
   }
 
   countDeltaPos( clientX: number, clientY: number ): number[] {
-    const { CANVAS_LEFT_MARGIN, CANVAS_TOP_MARGIN } = constants;
+    const CANVAS_LEFT_MARGIN = _.get(this.marginConfig, 'CANVAS_LEFT_MARGIN', constants.CANVAS_LEFT_MARGIN); 
+    const CANVAS_TOP_MARGIN = _.get(this.marginConfig, 'CANVAS_TOP_MARGIN', constants.CANVAS_TOP_MARGIN); 
     const posArr = [];
     const x = clientX - CANVAS_LEFT_MARGIN,
       y = clientY - CANVAS_TOP_MARGIN;

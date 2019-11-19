@@ -5,6 +5,7 @@ import Panel from "./components/Panel";
 import "antd/dist/antd.css";
 import ShapeWrap from "./components/ShapeWrap";
 import _ from "lodash";
+import { Button, Icon } from "antd";
 import {
   randomString,
   updateHandlersPos,
@@ -17,7 +18,6 @@ import ShapeHandler from "./components/ShapeHandler";
 import "./style.css";
 import Store from "./store";
 import RunButton from "./components/runButton";
-import TestChild from "./components/TestChild";
 import CreateApp from "./components/createApp";
 
 interface FlowEditorState {
@@ -31,29 +31,52 @@ interface FlowEditorState {
   taskStateMap: Map<string, string>;
 }
 
+interface FlowEditorProps {
+  marginConfig: any,
+  goBack: () => void
+}
+
 export default class FlowEditor extends React.Component<any, FlowEditorState> {
   staticData: Store;
-
+  state: any;
   constructor(props: any) {
     super(props);
-    this.staticData = new Store();
+    const { marginConfig, inputAppList } = props;
+    let tempList: any[] = [];
+    if (inputAppList && !_.isEmpty(inputAppList)) {
+      const tempMap: any = {
+        Deployment: 'task',
+        StatefulSet: 'human',
+      };
+      tempList = inputAppList.map((v: any) => {
+        const type = _.get(v, 'spec.config.controllers[0].type');
+        return {
+          id: randomString(12),
+          type: tempMap[type],
+          name: _.get(v, 'metadata.name'),
+        };
+      }
+        ); 
+    }
+    this.staticData = new Store(marginConfig);
+    this.state = {
+      selectedElementID: "",
+      objList: fromJS([]),
+      curMouseButton: undefined,
+      modalVisible: false,
+      initAppValues: undefined,
+      appList: [
+        // { id: "app1", type: "task", name: "app1" },
+        // { id: "app3", type: "human", name: "人工" },
+        // { id: "app0", type: "task", name: "app1" },
+        ...tempList,
+        { id: "app1", type: "logic", name: "条件判断" },
+        { id: "app2", type: "pause", name: "暂停" }
+      ],
+      transDataPointMap: fromJS({}),
+      taskStateMap: fromJS({})
+    }; 
   }
-  state = {
-    selectedElementID: "",
-    objList: fromJS([]),
-    curMouseButton: undefined,
-    modalVisible: false,
-    initAppValues: undefined,
-    appList: [
-      // { id: "app1", type: "task", name: "app1" },
-      // { id: "app3", type: "human", name: "人工" },
-      // { id: "app0", type: "task", name: "app1" },
-      { id: "app1", type: "logic", name: "条件判断" },
-      { id: "app2", type: "pause", name: "暂停" }
-    ],
-    transDataPointMap: fromJS({}),
-    taskStateMap: fromJS({})
-  };
 
   componentDidMount = () => {
     this.staticData.selector = document.getElementById("selector-layer");
@@ -249,12 +272,12 @@ export default class FlowEditor extends React.Component<any, FlowEditorState> {
     }
     // update element lines position
     if (dragging && action === "translate") {
-      updateHandlersPos(this.staticData);
+      updateHandlersPos(this.staticData, this.props.marginConfig);
       if (selectedElementID) {
         const lines = (this.staticData as any).attached[selectedElementID]
           .lines;
         if (lines.size > 0) {
-          const newPathMap = updatePaths(selected, lines);
+          const newPathMap = updatePaths(selected, lines, this.props.marginConfig);
           const { objList } = this.state;
           // update ObjList List
           this.setState({
@@ -289,15 +312,19 @@ export default class FlowEditor extends React.Component<any, FlowEditorState> {
     }
   };
 
+  // TODO huxt: replace delete path or node with hiding element
   removeShape = (shapeID: any) => {
+    const { selected } = this.staticData;
     const { objList } = this.state;
     const shapeIdx = objList.findIndex((s: any) => s.get("id") === shapeID);
-    //const lines = (this.staticData as any).attached[shapeID].lines; remove relation lines
     if (shapeIdx > -1) {
-      this.setState({
-        objList: objList.delete(shapeIdx),
-        selectedElementID: ""
-      });
+      (document.getElementById(shapeID) as any).setAttribute("display", 'none');
+      const lines = _.get(this.staticData, `attached[${shapeID}].lines`);//(this.staticData as any).attached[shapeID].lines;
+      if (lines && lines.size > 0) {
+        lines.forEach((lineId: string) => {
+          (document.getElementById(lineId) as any).setAttribute("display", 'none');
+        })
+      }
     }
   };
 
@@ -342,8 +369,7 @@ export default class FlowEditor extends React.Component<any, FlowEditorState> {
     if (app) {
       const { appList } = this.state;
       const id = _.get(app, "id");
-
-      appList.forEach(v => {
+      appList.forEach((v:any) => {
         if (id.indexOf(v.id) > -1) {
           v.name = app.name;
         }
@@ -452,8 +478,9 @@ export default class FlowEditor extends React.Component<any, FlowEditorState> {
           createShape={this.createShape}
           showAppForm={this.showAppForm}
           appList={appList}
+          marginConfig={this.props.marginConfig}
         />
-        <div id="work-space" tabIndex={0} onKeyUpCapture={this.keyUpHandler}>
+        <div id="work-space" tabIndex={0} onKeyUpCapture={this.keyUpHandler} style={{left: this.props.marginConfig.CANVAS_LEFT_MARGIN, top:this.props.marginConfig.CANVAS_TOP_MARGIN }}>
           <svg
             id="work-space-svg"
             focusable="false"
@@ -478,12 +505,13 @@ export default class FlowEditor extends React.Component<any, FlowEditorState> {
                 onContextMenu: this.onContextMenu,
                 broadCastTaskState: this.broadCastTaskState,
                 broadCastLineState: this.broadCastLineState,
-                onEditApp: this.showAppForm
+                onEditApp: this.showAppForm,
+                removeShape: this.removeShape
               }}
             />
             <g id="selector-layer">
               {selectedElementID && curMouseButton === 0 ? (
-                <ShapeHandler staticData={this.staticData} />
+                <ShapeHandler staticData={this.staticData} marginConfig={this.props.marginConfig}/>
               ) : null}
             </g>
           </svg>
@@ -494,6 +522,14 @@ export default class FlowEditor extends React.Component<any, FlowEditorState> {
           broadCastTaskState={this.broadCastTaskState}
           broadCastLineState={this.broadCastLineState}
         />
+        <div
+          style={{ position: "fixed", left: "200px", top: "55px", zIndex: 1000 }}
+        >
+          <Button type="primary" onClick={this.props.goBack}>
+            <Icon type="left" />
+            返回
+          </Button>
+        </div>
         <CreateApp
           modalVisible={this.state.modalVisible}
           handleCancel={this.handleCancel}
@@ -501,7 +537,6 @@ export default class FlowEditor extends React.Component<any, FlowEditorState> {
           updateApp={this.updateApp}
           initialValues={this.state.initAppValues}
         />
-        {/* <TestChild /> */}
       </div>
     );
   }

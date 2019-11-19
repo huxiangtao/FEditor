@@ -1,5 +1,5 @@
 import React from "react";
-import { Button, Icon } from "antd";
+import { Button, Icon, Divider } from "antd";
 import { TreeNode } from "../TreeNode";
 import { Map } from "immutable";
 import PauseNode from "../PauseNode";
@@ -33,11 +33,15 @@ class RunButton extends React.Component<RunButtonProps, any> {
   render() {
     return (
       <div
-        style={{ position: "fixed", right: "10px", top: "5px", zIndex: 1000 }}
+        style={{ position: "fixed", right: "10px", top: "55px", zIndex: 1000 }}
       >
         <Button type="primary" onClick={this.runFlow}>
           <Icon type="play-circle" />
-          Run
+          测试运行
+        </Button>
+        <Divider type="vertical" />
+        <Button type="primary">
+          流程发布
         </Button>
       </div>
     );

@@ -27,27 +27,33 @@ class CircleNode extends BaseNode {
       onContextMenu,
       curElement,
       nodeMap,
-      recurRunTask
+      recurRunTask,
+      removeShape
     } = this.props;
     const commonStyle = this.commonStyleFactory(curElement);
     const customProps = this.customPropsFactory(curElement);
     return (
       <Dropdown
         overlay={ActionMenu({
-          menuList: ["删除", "开始"],
+          menuList: ["删除","开始"],
           type: "pause",
-          onClick: type => {
-            if (type === "pause") {
-              (recurRunTask as (
-                id: string,
-                nodeMap: Map<string, TreeNode | PauseNode | LogicNode>,
-                trigger?: boolean
-              ) => void)(
-                id,
-                nodeMap as Map<string, TreeNode | PauseNode | LogicNode>,
-                true
-              );
+          onClick: (type:any, param:any) => {
+            if (param.key === '0') {
+              (removeShape as any)(id);
+            } else {
+              if (type === "pause") {
+                (recurRunTask as (
+                  id: string,
+                  nodeMap: Map<string, TreeNode | PauseNode | LogicNode>,
+                  trigger?: boolean
+                ) => void)(
+                  id,
+                  nodeMap as Map<string, TreeNode | PauseNode | LogicNode>,
+                  true
+                );
+              }
             }
+            
           }
         })}
         trigger={["contextMenu"]}

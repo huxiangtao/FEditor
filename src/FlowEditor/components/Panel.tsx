@@ -2,6 +2,7 @@ import React, { Fragment } from "react";
 import { Button } from "antd";
 import { constants } from "../constants/index";
 import "../style.css";
+import _ from 'lodash';
 
 const commonProps = {
   className: "shape-button",
@@ -19,6 +20,7 @@ interface PanelProps {
   ): void; //NOTE: 创建shape
   showAppForm?(): void;
   appList: any[];
+  marginConfig: any;
 }
 
 const shapeComponentMap = {
@@ -57,10 +59,11 @@ export default class Panel extends React.Component<PanelProps, any> {
   };
 
   dragEnd = (e: any, id: string, type: string, title: string) => {
-    const { CANVAS_LEFT_MARGIN } = constants;
+    const CANVAS_LEFT_MARGIN = _.get(this.props.marginConfig, 'CANVAS_LEFT_MARGIN', constants.CANVAS_LEFT_MARGIN); 
+    const CANVAS_TOP_MARGIN = _.get(this.props.marginConfig, 'CANVAS_TOP_MARGIN', constants.CANVAS_TOP_MARGIN); 
     const { createShape } = this.props;
     if (e.clientX > CANVAS_LEFT_MARGIN) {
-      createShape(type, id, title, [e.clientX - CANVAS_LEFT_MARGIN, e.clientY]);
+      createShape(type, id, title, [e.clientX - CANVAS_LEFT_MARGIN, e.clientY - CANVAS_TOP_MARGIN]);
     }
     if (this.curCloneNode) {
       document.body.removeChild(this.curCloneNode as any);
@@ -87,7 +90,7 @@ export default class Panel extends React.Component<PanelProps, any> {
   };
 
   render() {
-    const { CANVAS_LEFT_MARGIN } = constants;
+    const CANVAS_LEFT_MARGIN = _.get(this.props.marginConfig, 'CANVAS_LEFT_MARGIN', constants.CANVAS_LEFT_MARGIN); 
     const { appList } = this.props;
     const buttonContainerStyle = {
       width: CANVAS_LEFT_MARGIN + "px",
@@ -99,15 +102,15 @@ export default class Panel extends React.Component<PanelProps, any> {
           width: CANVAS_LEFT_MARGIN + "px"
         }}
       >
-        <p></p>
-        <Button
+        <p style={{ marginBottom: '30px' }}></p>
+        {/* <Button
           type="primary"
           icon="plus"
           size="small"
           onClick={this.props.showAppForm}
         >
           Add App
-        </Button>
+        </Button> */}
         <div style={buttonContainerStyle}>
           {appList.map(app => {
             return (
