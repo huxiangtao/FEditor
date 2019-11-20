@@ -289,15 +289,19 @@ export default class FlowEditor extends React.Component<any, FlowEditorState> {
     }
   };
 
+  // TODO huxt: replace delete path or node with hiding element
   removeShape = (shapeID: any) => {
+    const { selected } = this.staticData;
     const { objList } = this.state;
     const shapeIdx = objList.findIndex((s: any) => s.get("id") === shapeID);
-    //const lines = (this.staticData as any).attached[shapeID].lines; remove relation lines
     if (shapeIdx > -1) {
-      this.setState({
-        objList: objList.delete(shapeIdx),
-        selectedElementID: ""
-      });
+      (selected as any).setAttribute("display", 'none');
+      const lines = _.get(this.staticData, `attached[${shapeID}].lines`);//(this.staticData as any).attached[shapeID].lines;
+      if (lines && lines.size > 0) {
+        lines.forEach((lineId: string) => {
+          (document.getElementById(lineId) as any).setAttribute("display", 'none');
+        })
+      }
     }
   };
 
