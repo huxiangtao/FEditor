@@ -280,6 +280,23 @@ export default class Store {
     ( this.attached as any )[ eleId ].lines.add( lineId );
   }
 
+  deleteLineMap( lineId: string ) {
+    const lineInstance = this.LineMap.get( lineId );
+    console.log(lineInstance, 'lineInstance===');
+    const eleIdList = [_.get(lineInstance, 'to.id'), _.get(lineInstance, 'fr.id') ];
+    eleIdList.forEach((nodeId: string | undefined) => {
+      if (nodeId && ( this.attached as any )[ nodeId ]) {
+        ( this.attached as any )[ nodeId ].lines.delete( lineId );
+      }
+    })
+  }
+
+  deleteAttached(id: string) {
+    if (( this.attached as any )[ id ]) {
+      delete this.attached[id]
+    }
+  }
+
   countDeltaPos( clientX: number, clientY: number ): number[] {
     const { CANVAS_LEFT_MARGIN, CANVAS_TOP_MARGIN } = constants;
     const posArr = [];

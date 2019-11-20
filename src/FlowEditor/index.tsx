@@ -11,7 +11,7 @@ import {
   optimisePath,
   updatePaths
 } from "./utils";
-import { updateObjListLines } from "./reducer";
+import { updateObjListLines, updateObjListMatrix, updateObjListNodeHide } from "./reducer";
 import regularShapes from "./regularShapes";
 import ShapeHandler from "./components/ShapeHandler";
 import "./style.css";
@@ -47,7 +47,7 @@ export default class FlowEditor extends React.Component<any, FlowEditorState> {
     appList: [
       // { id: "app1", type: "task", name: "app1" },
       // { id: "app3", type: "human", name: "人工" },
-      // { id: "app0", type: "task", name: "app1" },
+      { id: "app0", type: "task", name: "app1" },
       { id: "app1", type: "logic", name: "条件判断" },
       { id: "app2", type: "pause", name: "暂停" }
     ],
@@ -201,8 +201,11 @@ export default class FlowEditor extends React.Component<any, FlowEditorState> {
     const { selectedElementID } = this.state;
     switch (action) {
       case "translate":
-        const mStr = `matrix(${matrix.join(" ")})`;
-        (selected as any).setAttribute("transform", mStr);
+        if (selectedElementID) {
+          const mStr = `matrix(${matrix.join(" ")})`;
+          (selected as any).setAttribute("transform", mStr);
+          //this.setState({objList: updateObjListMatrix(this.state.objList, selectedElementID, mStr)});
+        }
         break;
       case "draw-line":
         // current draw line element
@@ -292,10 +295,21 @@ export default class FlowEditor extends React.Component<any, FlowEditorState> {
   removeShape = (shapeID: any) => {
     const { objList } = this.state;
     const shapeIdx = objList.findIndex((s: any) => s.get("id") === shapeID);
-    //const lines = (this.staticData as any).attached[shapeID].lines; remove relation lines
     if (shapeIdx > -1) {
+      const lines = _.get(this.staticData, `attached[${shapeID}].lines`);
+      this.staticData.deleteAttached(shapeID)
+      let tempObjList = updateObjListNodeHide(objList, shapeIdx);//objList.delete(shapeIdx);
+      if (lines && lines.size > 0) {
+        lines.forEach((lineId: string) => {
+          const shapeLineIdx = tempObjList.findIndex((s: any) => s.get("id") === lineId);
+          if (shapeLineIdx > -1) {
+            tempObjList = updateObjListNodeHide(objList, shapeLineIdx);//tempObjList.delete(shapeLineIdx);
+            this.staticData.deleteLineMap(lineId);
+          }
+        });
+      }
       this.setState({
-        objList: objList.delete(shapeIdx),
+        objList: tempObjList,
         selectedElementID: ""
       });
     }

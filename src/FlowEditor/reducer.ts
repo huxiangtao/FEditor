@@ -24,3 +24,18 @@ export function updateObjListLines( objList: List<any>, lines: Set<any> | string
   }
   return nextObjList;
 }
+
+export function updateObjListMatrix(objList: List<any>, shapeId: string, matrix: string) {
+  const index = objList.findIndex( ( v: any ) => {
+    return v.get( "id" ) === shapeId;
+  } );
+  return objList.update( index, ( val: any ) => {
+    return val.set( "transform", matrix );
+  } );
+}
+
+export function updateObjListNodeHide(objList: List<any>, shapeIdx: number) {
+  return objList.update( shapeIdx, ( val: any ) => {
+    return val.set( "hide", true );
+  } ); 
+}

@@ -17,7 +17,7 @@ export default class PolyLine extends BaseLine {
     const { id, curElement, onContextMenu, transDataPointMap } = this.props;
     const customProps = this.customPropsFactory(curElement);
     const commonStyle = this.commonStyleFactory(curElement);
-    const pointsList = curElement.get("points").split(" ");
+    const pointsList = curElement.get("points") ? curElement.get("points").split(" ") : [];
     return (
       <g
         key={id}

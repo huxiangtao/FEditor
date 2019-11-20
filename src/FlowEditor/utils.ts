@@ -249,7 +249,7 @@ export function updatePaths( selectedElement: any, connectedLine: any ) {
 
     ( ele as any ) = ele.getElementsByClassName( 'shape' )[ 0 ];
 
-    let points = ( ele as any ).getAttribute( 'points' ).split( ' ' );
+    let points = ( ele as any ).getAttribute( 'points' ) ? ( ele as any ).getAttribute( 'points' ).split( ' ' ) : [];
 
     let fromPoint = points[ 0 ].split( ',' ).map( ( num: any ) => parseInt( num ) );
     let toPoint = points[ points.length - 1 ].split( ',' ).map( ( num: any ) => parseInt( num ) );
