@@ -9,7 +9,7 @@ import {
   randomString,
   updateHandlersPos,
   optimisePath,
-  updatePaths
+  updatePaths,
 } from "./utils";
 import { updateObjListLines } from "./reducer";
 import regularShapes from "./regularShapes";
@@ -17,7 +17,6 @@ import ShapeHandler from "./components/ShapeHandler";
 import "./style.css";
 import Store from "./store";
 import RunButton from "./components/runButton";
-import TestChild from "./components/TestChild";
 import CreateApp from "./components/createApp";
 
 interface FlowEditorState {
@@ -49,10 +48,10 @@ export default class FlowEditor extends React.Component<any, FlowEditorState> {
       // { id: "app3", type: "human", name: "人工" },
       // { id: "app0", type: "task", name: "app1" },
       { id: "app1", type: "logic", name: "条件判断" },
-      { id: "app2", type: "pause", name: "暂停" }
+      { id: "app2", type: "pause", name: "暂停" },
     ],
     transDataPointMap: fromJS({}),
-    taskStateMap: fromJS({})
+    taskStateMap: fromJS({}),
   };
 
   componentDidMount = () => {
@@ -82,14 +81,14 @@ export default class FlowEditor extends React.Component<any, FlowEditorState> {
         ,
         ,
         deltaPos[0] + matrix[4],
-        deltaPos[1] + matrix[5]
+        deltaPos[1] + matrix[5],
       ])
     );
     const nextHandlerPos = this.staticData.updateHandlerPos(
       undefined,
       handlersPos.map((p: any) => [
         ((p as number[])[0] += deltaPos[0]),
-        ((p as number[])[1] += deltaPos[1])
+        ((p as number[])[1] += deltaPos[1]),
       ])
     );
     const placeholder = (this.staticData.selector as any).getElementsByTagName(
@@ -176,9 +175,9 @@ export default class FlowEditor extends React.Component<any, FlowEditorState> {
             shape1: this.state.selectedElementID,
             shape2: "",
             transform: "matrix(1 0 0 1 0 0)",
-            points: `${startPointPos.join(",")} ${startPointPos.join(",")}`
+            points: `${startPointPos.join(",")} ${startPointPos.join(",")}`,
           })
-        )
+        ),
       });
     } else {
       this.staticData.updateSelected(null);
@@ -193,7 +192,7 @@ export default class FlowEditor extends React.Component<any, FlowEditorState> {
       action,
       dragging,
       selected,
-      transform: { matrix }
+      transform: { matrix },
     } = this.staticData;
     if (!action || !dragging) {
       return;
@@ -227,7 +226,7 @@ export default class FlowEditor extends React.Component<any, FlowEditorState> {
             (hoveredEle as any).setAttribute("filter", "none");
             const path = optimisePath(fromRec, toRect);
             this.setState({
-              objList: updateObjListLines(objList, lineId, path)
+              objList: updateObjListLines(objList, lineId, path),
             });
             (line as any)
               .getElementsByClassName("shape")[0]
@@ -258,7 +257,7 @@ export default class FlowEditor extends React.Component<any, FlowEditorState> {
           const { objList } = this.state;
           // update ObjList List
           this.setState({
-            objList: updateObjListLines(objList, lines, newPathMap)
+            objList: updateObjListLines(objList, lines, newPathMap),
           });
         }
       }
@@ -296,7 +295,7 @@ export default class FlowEditor extends React.Component<any, FlowEditorState> {
     if (shapeIdx > -1) {
       this.setState({
         objList: objList.delete(shapeIdx),
-        selectedElementID: ""
+        selectedElementID: "",
       });
     }
   };
@@ -316,7 +315,7 @@ export default class FlowEditor extends React.Component<any, FlowEditorState> {
 
   handleCancel = () => {
     this.setState({
-      modalVisible: false
+      modalVisible: false,
     });
   };
 
@@ -333,7 +332,7 @@ export default class FlowEditor extends React.Component<any, FlowEditorState> {
       const { appList } = this.state;
       this.setState({
         appList: [app, ...appList],
-        modalVisible: false
+        modalVisible: false,
       });
     }
   };
@@ -343,14 +342,14 @@ export default class FlowEditor extends React.Component<any, FlowEditorState> {
       const { appList } = this.state;
       const id = _.get(app, "id");
 
-      appList.forEach(v => {
+      appList.forEach((v) => {
         if (id.indexOf(v.id) > -1) {
           v.name = app.name;
         }
       });
       this.setState({
         appList,
-        modalVisible: false
+        modalVisible: false,
       });
       this.updateShape(id, app.name);
     }
@@ -369,7 +368,7 @@ export default class FlowEditor extends React.Component<any, FlowEditorState> {
     });
     if (nextObjList) {
       this.setState({
-        objList: nextObjList
+        objList: nextObjList,
       });
     }
   };
@@ -387,7 +386,7 @@ export default class FlowEditor extends React.Component<any, FlowEditorState> {
     const customProps = {
       id: shapeId,
       title,
-      transform: `matrix(${matrix.join(" ")})`
+      transform: `matrix(${matrix.join(" ")})`,
     };
     Object.assign(newShape, customProps);
     // set new node int NodeMap
@@ -395,13 +394,13 @@ export default class FlowEditor extends React.Component<any, FlowEditorState> {
       this.staticData.createNode(shapeId, type, {
         title,
         inputsNum: 1,
-        outputsNum: 2
+        outputsNum: 2,
       });
     } else {
       this.staticData.createNode(shapeId, type, { title });
     }
     this.setState({
-      objList: objList.push(fromJS(newShape))
+      objList: objList.push(fromJS(newShape)),
     });
   };
 
@@ -409,14 +408,14 @@ export default class FlowEditor extends React.Component<any, FlowEditorState> {
     //广播完成任务的node id
     const { transDataPointMap } = this.state;
     this.setState({
-      transDataPointMap: transDataPointMap.set(lineId, state)
+      transDataPointMap: transDataPointMap.set(lineId, state),
     });
   };
 
   broadCastTaskState = (nodeId: string, state: string) => {
     const { taskStateMap } = this.state;
     this.setState({
-      taskStateMap: taskStateMap.set(nodeId, state)
+      taskStateMap: taskStateMap.set(nodeId, state),
     });
   };
 
@@ -427,7 +426,7 @@ export default class FlowEditor extends React.Component<any, FlowEditorState> {
       curMouseButton,
       appList,
       transDataPointMap,
-      taskStateMap
+      taskStateMap,
     } = this.state;
     objList.forEach((o: any) => {
       if (!o) {
@@ -442,7 +441,7 @@ export default class FlowEditor extends React.Component<any, FlowEditorState> {
         this.staticData.addAttached(objID, {
           lines: new Set(),
           text: "",
-          type: o.get("type")
+          type: o.get("type"),
         });
       }
     });
@@ -478,7 +477,7 @@ export default class FlowEditor extends React.Component<any, FlowEditorState> {
                 onContextMenu: this.onContextMenu,
                 broadCastTaskState: this.broadCastTaskState,
                 broadCastLineState: this.broadCastLineState,
-                onEditApp: this.showAppForm
+                onEditApp: this.showAppForm,
               }}
             />
             <g id="selector-layer">
